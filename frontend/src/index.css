@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap');
+
+html {
+    font-family: "Archivo", serif;
+}
+
+.input_group {
+    position: relative;
+    padding: 16px 20px;
+    border: 1px solid #eaecf0;
+    border-radius: 28px;
+    display: flex;
+    width: 100%;
+    gap: 8px;
+}
+
+.after-line::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #77DADA;
+    right: 0;
+    bottom: -24px;
+}
+
+.secsion-bg {
+    background-image: url(../../frontend/src/assets/section-background.png);
+    background-repeat: no-repeat;
+}
+
+.image-partner {
+    object-fit: contain;
+}
+
+.footer {
+    background-color: #101828;
+}
+
+.footer-hover:hover {
+    color: #0e4f4f;
+}
