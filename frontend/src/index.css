@@ -17,6 +17,11 @@ html {
     gap: 8px;
 }
 
+.input_group:focus-within {
+    border: 1px solid #77DADA;
+    box-shadow: 0 0 0 4px #caf8f8;
+}
+
 .after-line::after {
     content: '';
     position: absolute;
