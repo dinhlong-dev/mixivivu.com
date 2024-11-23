@@ -48,3 +48,101 @@ html {
 .footer-hover:hover {
     color: #0e4f4f;
 }
+
+/* RESULT SEARCH */
+/* SECTION BG */
+.section-bg {
+    background-image: url(https://mixivivu.com/section-background.png);
+    background-repeat: repeat;
+}
+
+.cart-section {
+    border-radius: 32px;
+    border: 1px solid #eaecf0;
+    background: #fff;
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, .06), 0px 1px 3px 0px rgba(16, 24, 40, .1);;
+}
+
+.Checkbox_container__ccFUl>input:checked~.Checkbox_checkmark__81gnF {
+    border: 1px solid #0e4f4f;
+    background: #77dada;
+}
+
+.Checkbox_container__ccFUl>input[type=checkbox]~.Checkbox_checkmark__81gnF {
+    border-radius: 4px;
+}
+
+.Checkbox_checkmark__81gnF.Checkbox_sm__nLRCs {
+    width: 16px;
+    height: 16px;
+}
+
+.Checkbox_checkmark__81gnF {
+    border: 1px solid #d0d5dd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.Checkbox_checkmark__81gnF.Checkbox_sm__nLRCs>svg {
+    width: 12px;
+    height: 12px;
+    stroke-width: 1.6;
+}
+
+.Checkbox_checkmark__81gnF>svg {
+    content: "";
+    display: none;
+}
+
+.Checkbox_textGroup__Z0QZ_ {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 0;
+}
+
+.label.sm {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+}
+
+.Checkbox_title__rGvCj {
+    color: #344054;
+    font-weight: 500;
+}
+
+p.sm {
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.Checkbox_container__ccFUl input:checked~.Checkbox_checkmark__81gnF>svg {
+    display: block;
+    stroke: solid #0e4f4f;
+}
+
+.Button_button-color__7QnYK {
+    background-color: #77dada;
+    border: 1px solid #77dada;
+    color: #0e4f4f;
+    fill: #0e4f4f;
+}
+
+.Button_button-normal__y4h10 {
+    padding: 16px 20px;
+    white-space: nowrap;
+}
+
+.Button_button__QHarr {
+    height: -moz-fit-content;
+    height: fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,9 +1,10 @@
 import React, { useCallback } from "react";
 import logo from '../../assets/logo.webp'
 import { Button } from "../../components";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { path } from "../../ultils/constants";
 import icons from '../../ultils/icons'
+
 
 const { FaPhoneAlt } = icons
 
@@ -27,7 +28,7 @@ const Header = () => {
                     </a>
                     <ul className="flex text-base gap-6 font-medium">
                         <li className="cursor-pointer py-3">Tìm du thuyền</li>
-                        <a href="./Flyticket"><li className="cursor-pointer py-3">Tìm vé máy bay</li></a>
+                        <Link to={`/${path.FLYTICKET}`}><li className="cursor-pointer py-3">Tìm vé máy bay</li></Link>
                         <li className="cursor-pointer py-3">Tìm khách sạn</li>
                         <li className="cursor-pointer py-3">Doanh nghiệp</li>
                         <li className="cursor-pointer py-3">Blog</li>

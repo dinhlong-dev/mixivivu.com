@@ -1,5 +1,13 @@
 export const path = {
     HOME: '/*',
-    LOGIN: '/login',
-    FLYTCKET: '/flyTicket'
+    FLYTICKET: 'flyticket',
+    RESULTSEARCH: 'flyticket/result-search',
+    
+    LOGIN: 'login',
+    
+    //ADMIN
+    SYSTEM: 'admin/*',
+    CREATE_AIRPORT: 'create-airport'
 }
+
+export default path

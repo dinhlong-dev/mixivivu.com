@@ -8,6 +8,7 @@ import morgan from 'morgan'
 import mongoose from 'mongoose'
 const airportRoute = require("./src/routes/airport")
 const flightRoute = require("./src/routes/flights")
+const authRoute = require("./src/routes/auth")
 // const bookingRoute = require("./src/routes/booking")
 
 
@@ -30,7 +31,8 @@ connectToMongo()
 
 app.use(cors({
     origin: process.env.CLIENT_URL,
-    methods: ["POST", 'GET', 'PUST', "DELETE"]
+    methods: ["POST", 'GET', 'PUST', "DELETE"], 
+    credentials: true
 }))
 
 app.use(bodyParser.json({ limit: "50mb" }))
@@ -40,6 +42,7 @@ app.use(morgan("common"))
 app.use("/v1/airport", airportRoute);
 // app.use("/v1/booking", bookingRoute);
 app.use("/v1/flight", flightRoute);
+app.use("/v1/auth", authRoute)
 
 app.use(express.json())
 app.use(express.urlencoded({ extends: true }))

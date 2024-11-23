@@ -122,6 +122,13 @@ const LayoutMain = () => {
         setDepartureSuggestions([]);
         setArrivalSuggestions([]);
     };
+
+    // Hàm để trả điều hướng xg trang kết quả tìm kiếm
+    const handleSearch = (event) => {
+        event.preventDefault();
+
+        
+    }
     return (
         <div className='layout-main'>
             <div className=''>
@@ -282,7 +289,7 @@ const LayoutMain = () => {
                                         <input type="number" min="0" defaultValue="0" className="w-full outline-none" />
                                     </label>
                                 </div>
-                                <div className='w-[23.9%]'><button type="submit" className="max-w-[280px] w-[280px] text-primary bg-primary rounded-100 py-[16px] px-[20px] font-medium hover:bg-primary_dark hover:text-white">Tìm chuyến bay</button></div>
+                                <div className='w-[23.9%]'><button type="submit" onClick={handleSearch} className="max-w-[280px] w-[280px] text-primary bg-primary rounded-100 py-[16px] px-[20px] font-medium hover:bg-primary_dark hover:text-white">Tìm chuyến bay</button></div>
                             </div>
                         </div>
                     </div>

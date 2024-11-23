@@ -88,7 +88,8 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     email: {
-        type: String
+        type: String,
+        require: true
     },
     role: {
         type: String,

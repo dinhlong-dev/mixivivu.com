@@ -14,7 +14,9 @@ module.exports = {
       },
       backgroundColor: {
         primary: '#77DADA',
-        primary_dark: '#0e4f4f'
+        primary_dark: '#0e4f4f',
+        login_bg: 'rgba(0, 0, 0, 0.5);',
+        input_bg: 'rgba(255, 255, 255, 0.15)'
       },
       colors: {
         primary: '#0e4f4f',

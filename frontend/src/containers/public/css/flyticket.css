@@ -1,6 +1,6 @@
 .suggestions-dropdown {
     position: absolute;
-    min-width: 520px;
+    min-width: 390px;
     width: fit-content;
     max-height: 200px;
     border-radius: 8px;
@@ -24,11 +24,9 @@
   }
 
 .suggestions-dropdown_departure {
-    left: 28px;
 }
 
 .suggestions-dropdown_arrival {
-    right: 76px;
 }
 
 /* Override các lớp CSS của react-datepicker */
