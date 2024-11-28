@@ -4,18 +4,41 @@ import mongoose from "mongoose";
 
 const airportSchema = new mongoose.Schema({
     code: {
-        type: String, unique: true, required: true
+        type: String,
+        unique: true,
+        required: true
     },
-    name: String,
-    city: String,
-    country: String
+    name: {
+        type: String,
+        required: true
+    },
+    city: {
+        type: String,
+        required: true
+    },
+    country: {
+        type: String,
+        required: true
+    }
+});
+
+const airlinesSchema = new mongoose.Schema({
+    code: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    name: {
+        type: String,
+        unique: true,
+        required: true
+    }
 });
 
 const bookingSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
     },
     flight_id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -24,11 +47,12 @@ const bookingSchema = new mongoose.Schema({
     booking_date: {
         type: Date,
     },
-    tolal_price: {
+    total_price: {
         type: Number
     },
     status: {
-        type: String
+        type: String,
+        enum: ['pending', 'confirmed', 'cancelled']
     },
     emailVerified: {
         type: Boolean
@@ -42,6 +66,7 @@ const flightsSchema = new mongoose.Schema({
     flight_number: {
         type: String,
         required: true,
+        unique: true
     },
     departure_airport: {
         type: mongoose.Schema.Types.ObjectId,
@@ -52,29 +77,64 @@ const flightsSchema = new mongoose.Schema({
         ref: 'Airport'
     },
     departure_date: {
-        type: Date
+        type: Date,
+        required: true
     },
     arrival_date: {
-        type: Date
+        type: Date,
+        required: true
     },
     flight_duration: {
         type: Number
     },
-    price: {
-        type: Number
+    price_adult: {
+        type: Number,
+        required: true
+    },
+    price_child: {
+        type: Number,
+        required: true
+    },
+    price_infant: {
+        type: Number,
+        required: true
     },
     available_seats: {
-        type: Number
-    }
+        type: Number,
+        default: 0
+    },
+    airline: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AirLine',
+        required: true
+    },
+    seat_class: {
+        type: String,
+        enum: ['Economy', 'Business', 'First'],
+        required: true
+    },
+    carry_on_baggage: {
+        type: String
+    },
+    checked_baggage: {
+        type: String
+    },
 })
 
 const passengerSchema = new mongoose.Schema({
     booking_id: {
-        type: mongoose.Schema.Types.ObjectId, ref: 'Booking'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Booking'
     },
     name: String,
     age_category: {
-        type: [String]
+        type: String,
+        enum: ['Người lớn', 'Trẻ em', 'Em bé'],
+        required: true
+    },
+    price: {
+        type: Number,
+        required: true
     }
 });
 
@@ -104,7 +164,10 @@ const paymentSchema = new mongoose.Schema({
     payment_date: Date,
     amount: Number,
     payment_method: String,
-    status: String
+    status: {
+        type: String,
+        emun: ['pending', 'completed', 'failed']
+    }
 });
 
 let Airport = mongoose.model("Airport", airportSchema)
@@ -113,6 +176,7 @@ let Flight = mongoose.model("Flight", flightsSchema)
 let Passenger = mongoose.model('Passenger', passengerSchema);
 let Payment = mongoose.model('Payment', paymentSchema);
 let User = mongoose.model("User", userSchema)
+let AirLine = mongoose.model("AirLine", airlinesSchema)
 
 module.exports = {
     Airport,
@@ -120,5 +184,6 @@ module.exports = {
     Flight,
     Passenger,
     Payment,
-    User
+    User,
+    AirLine
 }

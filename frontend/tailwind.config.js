@@ -7,7 +7,11 @@ module.exports = {
   theme: {
     extend: {
       width: {
-        '1280': '1280px'
+        '1280': '1280px',
+        'initial': 'initial'
+      },
+      height: {
+        'initial': 'initial'
       },
       fontSize: {
         fz_14: '14px'

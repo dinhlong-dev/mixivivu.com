@@ -10,6 +10,7 @@ const airportRoute = require("./src/routes/airport")
 const flightRoute = require("./src/routes/flights")
 const authRoute = require("./src/routes/auth")
 // const bookingRoute = require("./src/routes/booking")
+const airlineRoute = require("./src/routes/airlines")
 
 
 const app = express()
@@ -43,6 +44,7 @@ app.use("/v1/airport", airportRoute);
 // app.use("/v1/booking", bookingRoute);
 app.use("/v1/flight", flightRoute);
 app.use("/v1/auth", authRoute)
+app.use("/v1/airline", airlineRoute)
 
 app.use(express.json())
 app.use(express.urlencoded({ extends: true }))

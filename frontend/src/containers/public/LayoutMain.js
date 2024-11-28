@@ -5,6 +5,7 @@ import HeadingLine from '../../assets/heading-border.webp'
 import Quote from '../../assets/quote.webp'
 import DatePicker, { registerLocale } from 'react-datepicker';
 import vi from 'date-fns/locale/vi'
+import axios from 'axios'
 import 'react-datepicker/dist/react-datepicker.css';
 import flight0 from '../../assets/flight-partner/flight-partner-0.png'
 import flight1 from '../../assets/flight-partner/flight-partner-1.png'
@@ -23,6 +24,7 @@ import flight13 from '../../assets/flight-partner/flight-partner-13.png'
 import flight14 from '../../assets/flight-partner/flight-partner-0.png'
 import "./css/flyticket.css"
 import customViLocale from "../System/custom/customViLocale"
+import { useNavigate, useHistory } from 'react-router-dom';
 
 registerLocale('vi-custom', customViLocale);
 
@@ -36,12 +38,14 @@ const LayoutMain = () => {
         }
         else {
             setIsRoundTrip(false);
+            setReturnDate('');
         }
     }
 
     // ham chon thoi gian
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const [currentDateTime, setCurrentDateTime] = useState(new Date());
+    const [departureDate, setDepartureDate] = useState(new Date());
+    const [returnDate, setReturnDate] = useState(null);
+    const [currentDateTime, setCurrentDateTime] = useState(null);
     const datePickerRef = useRef(null);
 
     useEffect(() => {
@@ -51,8 +55,15 @@ const LayoutMain = () => {
         return () => clearInterval(timer); // Dọn dẹp timer khi component bị unmount 
     }, []);
 
-    const handleDateChange = (date) => {
-        setSelectedDate(date);
+    const handleDepartureDateChange = (date) => {
+        setDepartureDate(date);
+        if (datePickerRef.current) {
+            datePickerRef.current.setOpen(false);
+        }
+    };
+
+    const handleReturnDateChange = (date) => {
+        setReturnDate(date);
         if (datePickerRef.current) {
             datePickerRef.current.setOpen(false);
         }
@@ -123,11 +134,127 @@ const LayoutMain = () => {
         setArrivalSuggestions([]);
     };
 
-    // Hàm để trả điều hướng xg trang kết quả tìm kiếm
-    const handleSearch = (event) => {
+    // Hàm tìm kiếm 
+    const navigate = useNavigate();
+    const [adults, setAdults] = useState(1)
+    const [children, setChildren] = useState(0)
+    const [infants, setInfants] = useState(0)
+    const [airports, setAirports] = useState([]);
+
+    useEffect(() => {
+        const fetchAirports = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/v1/airport/');
+                setAirports(response.data);
+            } catch (error) {
+                console.error('Error fetching airports:', error);
+            }
+        }; fetchAirports();
+    }, []);
+
+    const formatDate = (date) => {
+        if (!date || isNaN(date.getTime())) {
+            return null;
+        }
+        const year = date.getFullYear();
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const day = (`0${date.getDate()}`).slice(-2);
+        return `${year}-${month}-${day}`;
+    };
+
+    const daysOfWeek = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+
+    const formatDateString = (dateString) => {
+        const date = new Date(dateString); 
+        const dayOfWeek = daysOfWeek[date.getDay()]; 
+        const day = (`0${date.getDate()}`).slice(-2); 
+        const month = (`0${date.getMonth() + 1}`).slice(-2); 
+        const year = date.getFullYear(); 
+        return `${dayOfWeek}, ${day}/${month}/${year}`;
+    };
+
+    const handleButtonSearch = async (event) => {
         event.preventDefault();
 
-        
+        if (!departureQuery || !arrivalQuery || !departureDate || adults === 0) {
+            console.error("Vui lòng nhập đầy đủ thông tin cần thiết để tìm chuyến bay.");
+            return;
+        }
+
+        const formattedDepartureDate = formatDate(departureDate);
+        const formattedReturnDate = returnDate ? formatDate(returnDate) : null;
+
+        if (!formattedDepartureDate || (isRoundTrip && !formattedReturnDate)) {
+            console.error('Invalid date format');
+            return;
+        }
+
+        const getCodeFromQuery = (query) => {
+            const match = query.match(/\(([^)]+)\)/); // Tìm chuỗi trong ngoặc đơn 
+            return match ? match[1] : query; // Nếu có kết quả, trả về mã sân bay, ngược lại trả về chính chuỗi đó 
+        };
+
+        const departureCode = getCodeFromQuery(departureQuery);
+        const arrivalCode = getCodeFromQuery(arrivalQuery)
+
+        // Tìm ID sân bay từ danh sách sân bay 
+        const departureAirport = airports.find(airport => airport.code === departureCode.toUpperCase());
+        const arrivalAirport = airports.find(airport => airport.code === arrivalCode.toUpperCase());
+
+        if (!departureAirport || !arrivalAirport) {
+            console.error('Không tìm thấy ID sân bay.');
+            return;
+        }
+
+        // Tạo quert string 
+        const queryParams = {
+            from: departureAirport._id,
+            to: arrivalAirport._id,
+            departureDate: formattedDepartureDate,
+            adults: adults,
+            children: children,
+            infants: infants
+        };
+
+        if (isRoundTrip) {
+            queryParams.returnDate = formattedReturnDate;
+        }
+
+        // console.log(queryParams);
+
+        try {
+            // Gửi request đến API
+            const response = await axios.get(`http://localhost:5000/v1/flight/search`, {
+                params: queryParams
+            });
+
+            console.log(response.data);  // Kiểm tra dữ liệu trả về
+
+            // Điều hướng đến result page
+            navigate('/flyticket/result-search', {
+                state: {
+                    flights: response.data,
+                    searchInfo: {
+                        departureQuery,
+                        arrivalQuery,
+                        departureDate,
+                        returnDate,
+                        adults,
+                        children,
+                        infants,
+                        departureCode,
+                        arrivalCode,
+                        departureName: departureAirport.name,
+                        arrivalName: arrivalAirport.name,
+                        formattedDepartureDate: formatDateString(departureDate), 
+                        formattedReturnDate: returnDate ? formatDateString(returnDate) : null
+                    }
+                }
+            })
+        } catch (error) {
+            console.error('Lỗi lấy thông tin tìm kiếm:', error);
+        }
+
     }
     return (
         <div className='layout-main'>
@@ -224,8 +351,8 @@ const LayoutMain = () => {
                                         <label className="absolute top-[-12px] left-6 text-ab_text text-fz_14 ">Ngày đi</label>
                                         <DatePicker
                                             ref={datePickerRef}
-                                            selected={selectedDate}
-                                            onChange={handleDateChange}
+                                            selected={departureDate}
+                                            onChange={handleDepartureDateChange}
                                             minDate={new Date()}
                                             // shouldCloseOnSelect={true}
                                             dateFormat="dd/MM/yyyy"
@@ -234,7 +361,7 @@ const LayoutMain = () => {
                                                 <input
                                                     type='text'
                                                     className="rounded-[28px] outline-none w-full custom-date-input text-slate-700"
-                                                    value={`${selectedDate.toLocaleDateString()} ${currentDateTime.toLocaleDateString()}`}
+                                                    value={departureDate ? departureDate.toLocaleDateString() : `${currentDateTime.toLocaleDateString()}`}
                                                     readOnly
                                                 />
                                             }
@@ -248,8 +375,8 @@ const LayoutMain = () => {
                                             <label className="absolute top-[-12px] left-6 text-ab_text text-fz_14">Ngày về</label>
                                             <DatePicker
                                                 ref={datePickerRef}
-                                                selected={selectedDate}
-                                                onChange={handleDateChange}
+                                                selected={returnDate}
+                                                onChange={handleReturnDateChange}
                                                 minDate={new Date()}
                                                 // shouldCloseOnSelect={true}
                                                 dateFormat="dd/MM/yyyy"
@@ -258,7 +385,7 @@ const LayoutMain = () => {
                                                     <input
                                                         type='text'
                                                         className="rounded-[28px] outline-none w-full custom-date-input text-slate-700"
-                                                        value={`${selectedDate.toLocaleDateString()} ${currentDateTime.toLocaleDateString()}`}
+                                                        value={returnDate ? returnDate.toLocaleDateString() : `${currentDateTime.toLocaleDateString()}`}
                                                         readOnly
                                                     />
                                                 }
@@ -272,24 +399,42 @@ const LayoutMain = () => {
                                     <label className='input_group'>
                                         <svg className='' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path className='stroke-[#98a2b3]' d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                         <label className="absolute top-[-12px] left-6 text-ab_text text-fz_14">Người lớn</label>
-                                        <input type="number" min="1" defaultValue="1" className="w-full outline-none" />
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            defaultValue="1"
+                                            className="w-full outline-none"
+                                            onChange={(e) => setAdults(parseInt(e.target.value) || 1)}
+                                        />
                                     </label>
                                 </div>
                                 <div className='w-[23.9%]'>
                                     <label className='input_group'>
                                         <svg className='' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path className='stroke-[#98a2b3]' d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                         <label className="absolute top-[-12px] left-6 text-ab_text text-fz_14">Trẻ em</label>
-                                        <input type="number" min="0" defaultValue="0" className="w-full outline-none" />
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            defaultValue="0"
+                                            className="w-full outline-none"
+                                            onChange={(e) => setChildren(parseInt(e.target.value) || 0)}
+                                        />
                                     </label>
                                 </div>
                                 <div className='w-[23.9%]'>
                                     <label className='input_group'>
                                         <svg className='' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path className='stroke-[#98a2b3]' d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                         <label className="absolute top-[-12px] left-[28px] text-ab_text text-fz_14">Em bé</label>
-                                        <input type="number" min="0" defaultValue="0" className="w-full outline-none" />
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            defaultValue="0"
+                                            className="w-full outline-none"
+                                            onChange={(e) => setInfants(parseInt(e.target.value) || 0)}
+                                        />
                                     </label>
                                 </div>
-                                <div className='w-[23.9%]'><button type="submit" onClick={handleSearch} className="max-w-[280px] w-[280px] text-primary bg-primary rounded-100 py-[16px] px-[20px] font-medium hover:bg-primary_dark hover:text-white">Tìm chuyến bay</button></div>
+                                <div className='w-[23.9%]'><button type="submit" onClick={handleButtonSearch} className="max-w-[280px] w-[280px] text-primary bg-primary justify-center rounded-100 py-[16px] px-[20px] font-medium hover:bg-primary_dark hover:text-white">Tìm chuyến bay</button></div>
                             </div>
                         </div>
                     </div>
