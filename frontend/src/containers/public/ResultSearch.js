@@ -151,8 +151,10 @@ const ResultSeach = () => {
   }
 
   // 
-  const handleButtonNotOpenClick = (event) => {
-    event.stopPropagation();
+  const [selectedFlightID, setSelectedFlightID] = useState(null)
+  const handleButtonNotOpenClick = (e) => {
+    setIsChoose(!isChoose)
+    e.stopPropagation();
   };
 
   // Lấy danh sách các hãng bay từ chuyến bay
@@ -162,6 +164,9 @@ const ResultSeach = () => {
   const filteredFlights = filterAirlines.length > 0
     ? flights.filter(flights => filterAirlines.includes(flights.airline.name))
     : flights;
+
+  // Handle IsChoosed
+  const [isChoose, setIsChoose] = useState(false)
 
   return (
     <div className='LayoutMain'>
@@ -192,7 +197,7 @@ const ResultSeach = () => {
               <div className='flex gap-4 items-center'>
                 <button onClick={handleButtonClick} type='button' className='flex gap-2 text-primary fill-primary border-none bg-transparent shadow-none h-fit w-fit justify-center items-center'>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M16.6667 14.1667H3.33337M3.33337 14.1667L6.66671 10.8333M3.33337 14.1667L6.66671 17.5M3.33337 5.83333H16.6667M16.6667 5.83333L13.3334 2.5M16.6667 5.83333L13.3334 9.16667" stroke="#0E4F4F" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                  <div className='text-[14px] text-[#0e4f4f]'>{isRoundTrip ? 'Khứ hồi' : 'Một chiều'}</div>
+                  <div className='text-[14px] text-[#0e4f4f]'>{!isRoundTrip ? 'Khứ hồi' : 'Một chiều'}</div>
                 </button>
                 <div>
                   <div className='relative'>
@@ -294,7 +299,7 @@ const ResultSeach = () => {
                     </div>
                   </div>
                 </div>
-                {isRoundTrip && (
+                {!isRoundTrip && (
                   <div className='flex-grow'>
                     <div className=''>
                       <div className=''>
@@ -455,7 +460,7 @@ const ResultSeach = () => {
                                       <p className="sm">VND</p>
                                     </div>
                                     <button onClick={handleButtonNotOpenClick} type="button" className="Button_button__QHarr FlightItemCard_select-btn__L2VsD Button_button-sm__ljQtM Button_button-outline__YRytX  ">
-                                      <div className="label sm">Chọn</div>
+                                      <div className="label sm" onClic>{!isChoose ? 'Chọn' : 'Chọn lại'}</div>
                                     </button>
                                     <div>
                                       <svg className='stroke-[#475467]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="var(--gray-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -513,7 +518,6 @@ const ResultSeach = () => {
                             ))}
                           </div>
                         </div>
-
                       ) : (
                         <div className='flex flex-col gap-4 py-4 px-6'>
                           <div className='flex flex-col items-center justify-center gap-5'>
@@ -539,126 +543,131 @@ const ResultSeach = () => {
                           </div>
                         </div>
                       )}
-                      <div className='flex justify-between items-center Pagination_pagination__dV9rN'>
-                        <div className="flex items-center gap-2 Pagination_left-pagination__IuI30">
-                          <p className="sm">Đang xem:</p>
-                          <div>
-                            <label className="md Pagination_page-size__Rakop">
-                              <input max="20" min="1" type="number" value="5" />
-                            </label>
-                          </div>
-                          <p className="sm">của 9</p>
-                        </div>
 
-                        <ul className="Pagination_pagination-container__J4wRd ">
-                          <li className="Pagination_pagination-left-item__Ni_lJ Pagination_pagination-item__ZzJmt Pagination_disabled__UwpSX">
-                            <svg className='stroke-[#344054]' xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4.16602 10H15.8327M4.16602 10L9.16602 5M4.16602 10L9.16602 15" stroke="var(--gray-700)" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                            <label className="sm">Trước</label>
-                          </li>
-                          <li className="Pagination_pagination-item__ZzJmt Pagination_selected__G5yaV">1</li>
-                          <li className="Pagination_pagination-item__ZzJmt ">2</li>
-                          <li className="Pagination_pagination-right-item__xEHMH Pagination_pagination-item__ZzJmt ">
-                            <label className="sm">Tiếp</label>
-                            <svg className='stroke-[#344054]' width="20" height="20" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="var(--gray-700)" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                          </li>
-                        </ul>
-                      </div>
+                      {!isChoose && (
+                        <div className='flex justify-between items-center Pagination_pagination__dV9rN'>
+                          <div className="flex items-center gap-2 Pagination_left-pagination__IuI30">
+                            <p className="sm">Đang xem:</p>
+                            <div>
+                              <label className="md Pagination_page-size__Rakop">
+                                <input max="20" min="1" type="number" value="5" />
+                              </label>
+                            </div>
+                            <p className="sm">của 9</p>
+                          </div>
+
+                          <ul className="Pagination_pagination-container__J4wRd ">
+                            <li className="Pagination_pagination-left-item__Ni_lJ Pagination_pagination-item__ZzJmt Pagination_disabled__UwpSX">
+                              <svg className='stroke-[#344054]' xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4.16602 10H15.8327M4.16602 10L9.16602 5M4.16602 10L9.16602 15" stroke="var(--gray-700)" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                              <label className="sm">Trước</label>
+                            </li>
+                            <li className="Pagination_pagination-item__ZzJmt Pagination_selected__G5yaV">1</li>
+                            <li className="Pagination_pagination-item__ZzJmt ">2</li>
+                            <li className="Pagination_pagination-right-item__xEHMH Pagination_pagination-item__ZzJmt ">
+                              <label className="sm">Tiếp</label>
+                              <svg className='stroke-[#344054]' width="20" height="20" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="var(--gray-700)" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="Card_card__rC1zg CustomerInfo_customer-info__8_dK8">
-                <div className="CustomerInfo_customer-info__header__vUsm9">
-                  <div className="subheading md">Thông tin hành khách</div>
-                  <p className="sm text-[#f04438]">
-                    * Quý Khách vui lòng sử dụng tiếng Việt không dấu và không sử dụng các ký tự đặc biệt.
-                    <br />
-                    * Vui lòng nhập đầy đủ tên hành khách và những thông tin khác xuất hiện trên (các) giấy tờ tùy thân do chính phủ cấp của hành khách. (Số Căn cước công dân hoặc Hộ chiếu, ngày hết hạn phải chính xác)
-                    <br />
-                    * Lưu ý đặc biệt: Hệ thống của hãng hàng không VietJet Air sẽ không cho phép khách hàng đặt vé quá 02 lần mà không thanh toán. Quý khách vui lòng chắc chắn khi đặt vé để đảm bảo thanh toán thành công.
-                    <br />
-                    * Nếu cần sự hỗ trợ, quý khách vui lòng liên hệ Hotline của Mixivivu: 0922 222 016.
-                  </p>
-                </div><div className="CustomerInfo_customer-info__content__gFjoX">
-                  <div className="flex flex-col gap-6">
-                    <div className="flex gap-4 items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                      <div className="flex flex-col gap-1">
-                        <label className="sm">Người lớn</label>
-                        <p className="md">Hành khách 1</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 CustomerInfo_input-group__U1xTl">
-                      <div className="CustomerInfo_selectInput__Mwxef">
-                        <div className="relative">
-                          <div className=" ">
-                            <label for=":r1i:" className="Input_input-group__6PMfq">
-                              <input id=":r1i:" className="p-md" type="button" value="Nam" />
-                              <svg className='stroke-[#98a2b3]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                              <label for=":r1i:" className="sm "></label>
-                            </label>
-                          </div>
+              {isChoose && (
+                <div className="Card_card__rC1zg CustomerInfo_customer-info__8_dK8">
+                  <div className="CustomerInfo_customer-info__header__vUsm9">
+                    <div className="subheading md">Thông tin hành khách</div>
+                    <p className="sm text-[#f04438]">
+                      * Quý Khách vui lòng sử dụng tiếng Việt không dấu và không sử dụng các ký tự đặc biệt.
+                      <br />
+                      * Vui lòng nhập đầy đủ tên hành khách và những thông tin khác xuất hiện trên (các) giấy tờ tùy thân do chính phủ cấp của hành khách. (Số Căn cước công dân hoặc Hộ chiếu, ngày hết hạn phải chính xác)
+                      <br />
+                      * Lưu ý đặc biệt: Hệ thống của hãng hàng không VietJet Air sẽ không cho phép khách hàng đặt vé quá 02 lần mà không thanh toán. Quý khách vui lòng chắc chắn khi đặt vé để đảm bảo thanh toán thành công.
+                      <br />
+                      * Nếu cần sự hỗ trợ, quý khách vui lòng liên hệ Hotline của Mixivivu: 0922 222 016.
+                    </p>
+                  </div><div className="CustomerInfo_customer-info__content__gFjoX">
+                    <div className="flex flex-col gap-6">
+                      <div className="flex gap-4 items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        <div className="flex flex-col gap-1">
+                          <label className="sm">Người lớn</label>
+                          <p className="md">Hành khách 1</p>
                         </div>
                       </div>
-                      <div className=" ">
-                        <label for=":r1j:" className="Input_input-group__6PMfq">
-                          <input id=":r1j:" className="p-md" placeholder="Nhập họ" value="" />
-                          <label for=":r1j:" className="sm Input_required__eYDG_">Họ</label>
-                        </label>
-                      </div>
-                      <div className=" ">
-                        <label for=":r1k:" className="Input_input-group__6PMfq">
-                          <input id=":r1k:" className="p-md" placeholder="Nhập tên đệm và tên" value="" />
-                          <label for=":r1k:" className="sm Input_required__eYDG_">Tên đệm và tên</label>
-                        </label>
-                      </div>
-                      <div className=" ">
-                        <label for=":r1l:" className="Input_input-group__6PMfq">
-                          <input id=":r1l:" className="p-md" type="date" />
-                          <label for=":r1l:" className="sm Input_required__eYDG_">Ngày sinh</label>
-                        </label>
-                      </div>
-                      <div className=" ">
-                        <label for=":r1m:" className="Input_input-group__6PMfq">
-                          <input id=":r1m:" className="p-md" placeholder="Nhập CCCD" value="" />
-                          <label for=":r1m:" className="sm Input_required__eYDG_">CCCD</label>
-                        </label>
-                      </div>
-                      <div className=" ">
-                        <label for=":r1n:" className="Input_input-group__6PMfq">
-                          <input id=":r1n:" className="p-md" type="date" />
-                          <label for=":r1n:" className="sm Input_required__eYDG_">Ngày hết hạn CCCD</label>
-                        </label>
-                      </div>
-                    </div>
-                    <div className="CustomerInfo_customer-info__footer__wrr_x">
-                      <div className="grid grid-cols-2 gap-6 CustomerInfo_flight-packages__cPaVZ">
-                        <div className="flex gap-6">
-                          <div className="CustomerInfo_img-wrapper__Nyg9S">
-                            <div className="w-full h-full relative overflow-hidden">
-                              <img
-                                alt="mixivivu"
-                                src="/card-image.png"
-                                loading="lazy"
-                                className="object-cover w-full h-full"
-                              />
+                      <div className="grid grid-cols-3 gap-4 CustomerInfo_input-group__U1xTl">
+                        <div className="CustomerInfo_selectInput__Mwxef">
+                          <div className="relative">
+                            <div className=" ">
+                              <label for=":r1i:" className="Input_input-group__6PMfq">
+                                <input id=":r1i:" className="p-md" type="button" value="Nam" />
+                                <svg className='stroke-[#98a2b3]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                <label for=":r1i:" className="sm "></label>
+                              </label>
                             </div>
                           </div>
-                          <div className="flex flex-col gap-1">
-                            <label className="sm">HAN → DAD</label>
-                            <p className="sm">07:25, 01/12/2024</p>
-                          </div>
                         </div>
-                        <div>
-                          <div className="CustomerInfo_selectInput__Mwxef">
-                            <div className="relative">
-                              <div className=" ">
-                                <label for=":r1o:" className="Input_input-group__6PMfq">
-                                  <input id=":r1o:" className="p-md" type="button" value="Chọn hành lý ký gửi" />
-                                  <svg className='stroke-[#3C4046]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                  <label for=":r1o:" className="sm "></label>
-                                </label>
+                        <div className=" ">
+                          <label for=":r1j:" className="Input_input-group__6PMfq">
+                            <input id=":r1j:" className="p-md" placeholder="Nhập họ" value="" />
+                            <label for=":r1j:" className="sm Input_required__eYDG_">Họ</label>
+                          </label>
+                        </div>
+                        <div className=" ">
+                          <label for=":r1k:" className="Input_input-group__6PMfq">
+                            <input id=":r1k:" className="p-md" placeholder="Nhập tên đệm và tên" value="" />
+                            <label for=":r1k:" className="sm Input_required__eYDG_">Tên đệm và tên</label>
+                          </label>
+                        </div>
+                        <div className=" ">
+                          <label for=":r1l:" className="Input_input-group__6PMfq">
+                            <input id=":r1l:" className="p-md" type="date" />
+                            <label for=":r1l:" className="sm Input_required__eYDG_">Ngày sinh</label>
+                          </label>
+                        </div>
+                        <div className=" ">
+                          <label for=":r1m:" className="Input_input-group__6PMfq">
+                            <input id=":r1m:" className="p-md" placeholder="Nhập CCCD" value="" />
+                            <label for=":r1m:" className="sm Input_required__eYDG_">CCCD</label>
+                          </label>
+                        </div>
+                        <div className=" ">
+                          <label for=":r1n:" className="Input_input-group__6PMfq">
+                            <input id=":r1n:" className="p-md" type="date" />
+                            <label for=":r1n:" className="sm Input_required__eYDG_">Ngày hết hạn CCCD</label>
+                          </label>
+                        </div>
+                      </div>
+                      <div className="CustomerInfo_customer-info__footer__wrr_x">
+                        <div className="grid grid-cols-2 gap-6 CustomerInfo_flight-packages__cPaVZ">
+                          <div className="flex gap-6">
+                            <div className="CustomerInfo_img-wrapper__Nyg9S">
+                              <div className="w-full h-full relative overflow-hidden">
+                                <img
+                                  alt="mixivivu"
+                                  src="/card-image.png"
+                                  loading="lazy"
+                                  className="object-cover w-full h-full"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <label className="sm">HAN → DAD</label>
+                              <p className="sm">07:25, 01/12/2024</p>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="CustomerInfo_selectInput__Mwxef">
+                              <div className="relative">
+                                <div className=" ">
+                                  <label for=":r1o:" className="Input_input-group__6PMfq">
+                                    <input id=":r1o:" className="p-md" type="button" value="Chọn hành lý ký gửi" />
+                                    <svg className='stroke-[#3C4046]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                    <label for=":r1o:" className="sm "></label>
+                                  </label>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -667,75 +676,79 @@ const ResultSeach = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              <div className="Card_card__rC1zg CustomerInfo_customer-info__8_dK8">
-                <div className="CustomerInfo_customer-info__header__vUsm9">
-                  <div className="subheading md">Thông tin liên hệ</div>
-                </div>
-                <div className="CustomerInfo_customer-info__content__gFjoX">
-                  <div className="flex flex-col gap-6">
-                    <div className="grid grid-cols-2 gap-4 CustomerInfo_input-group__U1xTl">
-                      <div className="relative">
+              {isChoose && (
+                <div className="Card_card__rC1zg CustomerInfo_customer-info__8_dK8">
+                  <div className="CustomerInfo_customer-info__header__vUsm9">
+                    <div className="subheading md">Thông tin liên hệ</div>
+                  </div>
+                  <div className="CustomerInfo_customer-info__content__gFjoX">
+                    <div className="flex flex-col gap-6">
+                      <div className="grid grid-cols-2 gap-4 CustomerInfo_input-group__U1xTl">
+                        <div className="relative">
+                          <div className=" ">
+                            <label for=":r1t:" className="Input_input-group__6PMfq">
+                              <input id=":r1t:" className="p-md" type="button" value="Ông" />
+                              <svg stroke='#98a2b3' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                              <label for=":r1t:" className="sm "></label>
+                            </label>
+                          </div>
+                        </div>
                         <div className=" ">
-                          <label for=":r1t:" className="Input_input-group__6PMfq">
-                            <input id=":r1t:" className="p-md" type="button" value="Ông" />
-                            <svg stroke='#98a2b3' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                            <label for=":r1t:" className="sm "></label>
+                          <label for=":r1u:" className="Input_input-group__6PMfq">
+                            <input id=":r1u:" className="p-md" placeholder="Nhập họ" value="" />
+                            <label for=":r1u:" className="sm ">Họ</label>
                           </label>
                         </div>
                       </div>
-                      <div className=" ">
-                        <label for=":r1u:" className="Input_input-group__6PMfq">
-                          <input id=":r1u:" className="p-md" placeholder="Nhập họ" value="" />
-                          <label for=":r1u:" className="sm ">Họ</label>
-                        </label>
+                      <div className="grid grid-cols-2 gap-4 CustomerInfo_input-group__U1xTl">
+                        <div className=" ">
+                          <label for=":r1v:" className="Input_input-group__6PMfq">
+                            <input id=":r1v:" className="p-md" placeholder="Nhập tên đệm và tên" value="" />
+                            <label for=":r1v:" className="sm ">Tên</label>
+                          </label>
+                        </div>
+                        <div className=" ">
+                          <label for=":r20:" className="Input_input-group__6PMfq">
+                            <input id=":r20:" className="p-md" placeholder="Nhập điện thoại" value="" />
+                            <label for=":r20:" className="sm ">Điện thoại</label>
+                          </label>
+                        </div>
                       </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 CustomerInfo_input-group__U1xTl">
-                      <div className=" ">
-                        <label for=":r1v:" className="Input_input-group__6PMfq">
-                          <input id=":r1v:" className="p-md" placeholder="Nhập tên đệm và tên" value="" />
-                          <label for=":r1v:" className="sm ">Tên</label>
-                        </label>
-                      </div>
-                      <div className=" ">
-                        <label for=":r20:" className="Input_input-group__6PMfq">
-                          <input id=":r20:" className="p-md" placeholder="Nhập điện thoại" value="" />
-                          <label for=":r20:" className="sm ">Điện thoại</label>
-                        </label>
-                      </div>
-                    </div>
-                    <button type="button" className="Button_button__QHarr  Button_button-normal__y4h10 Button_button-outline__YRytX  ">
-                      <span className="box-border inline-block overflow-hidden w-initial h-initial bg-none opacity-100 border-0 m-0 p-0 relative max-w-full">
-                        <span className="box-border block w-initial h-initial bg-none opacity-100 border-0 m-0 p-0 max-w-full">
-                          <img alt="" aria-hidden="true" src="data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%2715%27%20height=%2715%27/%3e" className="display: block; max-width: 100%; width: initial; height: initial; background: none; opacity: 1; border: 0px; margin: 0px; padding: 0px;" />
+                      <button type="button" className="Button_button__QHarr  Button_button-normal__y4h10 Button_button-outline__YRytX  ">
+                        <span className="box-border inline-block overflow-hidden w-initial h-initial bg-none opacity-100 border-0 m-0 p-0 relative max-w-full">
+                          <span className="box-border block w-initial h-initial bg-none opacity-100 border-0 m-0 p-0 max-w-full">
+                            <img alt="" aria-hidden="true" src="data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%2715%27%20height=%2715%27/%3e" className="display: block; max-width: 100%; width: initial; height: initial; background: none; opacity: 1; border: 0px; margin: 0px; padding: 0px;" />
+                          </span>
+                          <img
+                            srcset="https://mixivivu.com/_next/image?url=%2Fgmail.png&w=16&q=75 1x, https://mixivivu.com/_next/image?url=%2Fgmail.png&w=16&q=75 2x"
+                            src="https://mixivivu.com/_next/image?url=%2Fgmail.png&w=16&q=75"
+                            alt=''
+                            decoding="async"
+                            data-nimg="intrinsic"
+                            className="absolute inset-0 box-border p-0 border-none m-auto block w-0 h-0 min-w-full max-w-full min-h-full max-h-full"
+                          />
                         </span>
-                        <img
-                          srcset="https://mixivivu.com/_next/image?url=%2Fgmail.png&w=16&q=75 1x, https://mixivivu.com/_next/image?url=%2Fgmail.png&w=16&q=75 2x"
-                          src="https://mixivivu.com/_next/image?url=%2Fgmail.png&w=16&q=75"
-                          alt=''
-                          decoding="async"
-                          data-nimg="intrinsic"
-                          className="absolute inset-0 box-border p-0 border-none m-auto block w-0 h-0 min-w-full max-w-full min-h-full max-h-full"
-                        />
-                      </span>
-                      <div className="label md">Xác thực bằng gmail</div>
-                    </button>
+                        <div className="label md">Xác thực bằng gmail</div>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              <div className="flex justify-between">
-                <button type="button" className="Button_button__QHarr  Button_button-normal__y4h10 Button_button-outline__YRytX  ">
-                  <svg className='stroke-[#1d2939]' xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4.16602 10H15.8327M4.16602 10L9.16602 5M4.16602 10L9.16602 15" stroke="#344054" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                  <div className="label md">Quay lại</div>
-                </button>
-                <button type="button" className="Button_button__QHarr  Button_button-normal__y4h10 Button_button-color__7QnYK  " disabled="">
-                  <div className="label md">Tiếp</div>
-                  <svg className='stroke-[#1d2939]' width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                </button>
-              </div>
+              {isChoose && (
+                <div className="flex justify-between">
+                  <button type="button" className="Button_button__QHarr  Button_button-normal__y4h10 Button_button-outline__YRytX  ">
+                    <svg className='stroke-[#1d2939]' xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4.16602 10H15.8327M4.16602 10L9.16602 5M4.16602 10L9.16602 15" stroke="#344054" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    <div className="label md">Quay lại</div>
+                  </button>
+                  <button type="button" className="Button_button__QHarr  Button_button-normal__y4h10 Button_button-color__7QnYK  " disabled="">
+                    <div className="label md">Tiếp</div>
+                    <svg className='stroke-[#1d2939]' width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

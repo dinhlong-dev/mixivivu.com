@@ -636,6 +636,7 @@ p.md {
     width: 0;
     color: #1d2939;
     height: 24px;
+    outline: none;
 }
 
 .Input_input-group__6PMfq>svg {

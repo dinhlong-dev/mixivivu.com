@@ -1,7 +1,7 @@
+require('dotenv').config()
 const { Airport, Booking, Flight, Passenger, Payment, User } = require("../models/model");
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-require('dotenv').config()
 import * as authService from '../services/auth'
 
 const authController = {
@@ -66,30 +66,39 @@ const authController = {
                     message: "Email này chưa được đăng ký",
                 });
             }
-            
+
             // Mã hóa mật khẩu
             const comparePass = await bcryptjs.compare(req.body.password, userExists.password);
             console.log("Password Compare Result:", comparePass);
+
             if (!comparePass) {
                 return res.status(400).json({
                     message: "Mat khau khong dung"
                 });
             }
 
-            const token = jwt.sign({ _id: userExists._id }, process.env.SECRET_KEY, {
+            const token = jwt.sign({ _id: userExists._id, role: userExists.role }, process.env.SECRET_KEY, {
                 expiresIn: '7d',
             });
 
             userExists.password = undefined;
+
             res.status(201).json({
                 message: "Dang nhap thành công",
                 token: token || null,
                 user: userExists,
             });
         } catch (error) {
-            res.status(500).json(error)
+            console.error("Error during login:", error);  // Log lỗi để debug
+            res.status(500).json({ message: "Lỗi server, vui lòng thử lại", error: error.message });
         }
-        
+    },
+
+    getDashboard: async (req, res) => {
+        res.json({
+            msg: `Chao mung ${req.user._id} den voi dashboard`,
+            user: req.user
+        })
     }
 
     // login: async (req, res) => {
@@ -101,7 +110,7 @@ const authController = {
     //         })
     //         const response = await authService.loginService(req.body)
     //         return res.status(200).json(response)
-    
+
     //     } catch (error) {
     //         return res.status(500).json({
     //             err: -1,

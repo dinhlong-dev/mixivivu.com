@@ -1,0 +1,77 @@
+.Create-airport_container {
+    background-image: url(https://mixivivu.com/section-background.png);
+    background-repeat: repeat;
+}
+
+.InputSearch-Airport {
+    position: relative;
+    width: 300px;
+    padding: 12px 20px;
+    border-radius: 28px;
+    border: 1px solid #eaecf0;
+    box-shadow: 0px 1px 2px 0px #1018280d;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    fill: #fff;
+}
+
+.suggestions-dropdown {
+    position: absolute;
+    min-width: 390px;
+    width: fit-content;
+    max-height: 200px;
+    border-radius: 8px;
+    list-style-type: none; 
+    max-height: 200px; 
+    overflow-y: auto;
+    border: 1px solid #f2f4f7;
+    background: #fff;
+    box-shadow: 0 8px 8px -4px rgba(16, 24, 40, .03), 0 20px 24px -4px rgba(16, 24, 40, .08);
+    z-index: 4;
+}
+  
+  .suggestions-dropdown li {
+    padding: 15px 30px;
+    cursor: pointer;
+}
+  
+  .suggestions-dropdown li:hover {
+    width: 100%;
+    background-color: #f0f0f0;
+}
+
+.cart-airport {
+  border-radius: 32px;
+  border: 1px solid #eaecf0;
+  background: #fff;
+  box-shadow: 0px 1px 2px 0px rgba(16,24,40,.06),0px 1px 3px 0px rgba(16,24,40,.1)
+}
+
+/* Modal */
+.InputModal {
+  position: relative;
+  padding: 16px 20px;
+  border-radius: 28px;
+  border: 1px solid #eaecf0;
+  box-shadow: 0px 1px 2px 0px #1018280d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  fill: #fff;
+}
+
+.InputModal>label {
+  position: absolute;
+  top: 0;
+  transform: translateY(-50%);
+  left: 16px;
+  background-color: #fff;
+  padding: 0 4px;
+  color: var(--gray-600, #475467);
+}
+
+input {
+  outline: none;
+  width: 100%;
+}

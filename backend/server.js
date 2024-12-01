@@ -32,7 +32,7 @@ connectToMongo()
 
 app.use(cors({
     origin: process.env.CLIENT_URL,
-    methods: ["POST", 'GET', 'PUST', "DELETE"], 
+    methods: ["POST", 'GET', 'PUT', "DELETE"], 
     credentials: true
 }))
 

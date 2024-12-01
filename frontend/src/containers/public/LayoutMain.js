@@ -220,7 +220,7 @@ const LayoutMain = () => {
             queryParams.returnDate = formattedReturnDate;
         }
 
-        // console.log(queryParams);
+        console.log(queryParams);
 
         try {
             // Gửi request đến API

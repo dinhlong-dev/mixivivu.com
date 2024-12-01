@@ -6,8 +6,9 @@ export const path = {
     LOGIN: 'login',
     
     //ADMIN
-    SYSTEM: 'admin/*',
-    CREATE_AIRPORT: 'create-airport'
+    SYSTEM: 'admin/',
+    CREATE_AIRPORT: 'airport',
+    AIRLINE: 'airline'
 }
 
 export default path

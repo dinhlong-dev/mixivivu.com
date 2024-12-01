@@ -6,4 +6,9 @@ const router = require('express').Router()
 router.post('/', airlineController.addAirline)
 router.get('/', airlineController.getAirline)
 
+router.delete('/:id', airlineController.deleteAirline)
+
+router.put('/:id', airlineController.updateAirline)
+
+router.get('/search', airlineController.searchAirline)
 module.exports = router
