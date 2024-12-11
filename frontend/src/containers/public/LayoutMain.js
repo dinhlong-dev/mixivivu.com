@@ -165,13 +165,25 @@ const LayoutMain = () => {
     const daysOfWeek = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
 
     const formatDateString = (dateString) => {
-        const date = new Date(dateString); 
-        const dayOfWeek = daysOfWeek[date.getDay()]; 
-        const day = (`0${date.getDate()}`).slice(-2); 
-        const month = (`0${date.getMonth() + 1}`).slice(-2); 
-        const year = date.getFullYear(); 
+        const date = new Date(dateString);
+        const dayOfWeek = daysOfWeek[date.getDay()];
+        const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
         return `${dayOfWeek}, ${day}/${month}/${year}`;
     };
+
+    const formatDates = (dateString) => {
+        const date = new Date(dateString);
+        const hours = (`0${date.getHours()}`).slice(-2); // Giờ
+        const minutes = (`0${date.getMinutes()}`).slice(-2); // Phút
+        const day = (`0${date.getDate()}`).slice(-2); // Ngày
+        const month = (`0${date.getMonth() + 1}`).slice(-2); // Tháng
+        const year = date.getFullYear(); // Năm
+
+        // Trả về định dạng giờ:phút, ngày/tháng/năm
+        return `${hours}:${minutes}, ${day}/${month}/${year}`;
+    }
 
     const handleButtonSearch = async (event) => {
         event.preventDefault();
@@ -246,8 +258,10 @@ const LayoutMain = () => {
                         arrivalCode,
                         departureName: departureAirport.name,
                         arrivalName: arrivalAirport.name,
-                        formattedDepartureDate: formatDateString(departureDate), 
-                        formattedReturnDate: returnDate ? formatDateString(returnDate) : null
+                        formattedDepartureDate: formatDateString(departureDate),
+                        formattedReturnDate: returnDate ? formatDateString(returnDate) : null,
+                        formattedDps: formatDates(departureDate),
+                        formattedRts: returnDate ? formatDates(returnDate) : null
                     }
                 }
             })

@@ -22,7 +22,7 @@ const Header = () => {
           </a>
           <ul className="flex text-base gap-6 font-medium">
             <li className="cursor-pointer py-3">Quản lý tài khoản</li>
-            <Link to={`/${path.SYSTEM}`}><li className="cursor-pointer py-3">Quản lý chuyến bay</li></Link>
+            <a href='/admin/flight'><li className="cursor-pointer py-3">Quản lý chuyến bay</li></a>
             <a href='/admin/airline'><li className="cursor-pointer py-3">Quản lý hãng bay</li></a>
             <a href='/admin/airport'><li className="cursor-pointer py-3">Quản lý sân bay</li></a>
             <li className="cursor-pointer py-3">Blog</li>

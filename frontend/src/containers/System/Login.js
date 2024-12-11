@@ -76,7 +76,7 @@ const Login = () => {
             } catch (error) {
                 console.error('Error:', error); // Log chi tiết lỗi
                 setError(error.message); // Cập nhật lỗi cho người dùng
-                alert('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+                alert('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.');
             }
         } else {
             console.log('Invalid fields:', invalidFields); // In ra các trường không hợp lệ

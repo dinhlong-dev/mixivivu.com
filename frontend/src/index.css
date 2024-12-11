@@ -15,6 +15,16 @@ button {
     gap: 8px;
 }
 
+h4, h5 {
+    font-weight: 700;
+    color: #101828;
+}
+
+h4 {
+    font-size: 36px;
+    line-height: 44px;
+}
+
 .input_group {
     position: relative;
     padding: 16px 20px;
@@ -110,6 +120,12 @@ button {
     flex-direction: column;
     align-items: flex-start;
     flex: 1 0;
+}
+
+label.xl {
+    font-size: 20px;
+    line-height: 30px;
+    font-weight: 500;
 }
 
 .label.sm {
@@ -659,4 +675,9 @@ p.md {
 .Button_button-color__7QnYK:disabled {
     background-color: #caf8f8;
     pointer-events: none;
+}
+
+.Input_input-group__6PMfq:focus-within {
+    border: 1px solid #77DADA;
+    box-shadow: 0 0 0 4px #caf8f8;
 }

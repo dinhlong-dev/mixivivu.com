@@ -3,6 +3,7 @@ const { Airport, Booking, Flight, Passenger, Payment, User } = require("../model
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import * as authService from '../services/auth'
+const axios = require('axios');
 
 const authController = {
     // ADD USER
@@ -99,25 +100,32 @@ const authController = {
             msg: `Chao mung ${req.user._id} den voi dashboard`,
             user: req.user
         })
+    },
+
+    getUserInfo: async (req, res) => {
+        const { access_token } = req.body; // Lấy access_token từ body của request
+
+        if (!access_token) {
+            return res.status(400).json({ error: 'Access token is required' });
+        }
+
+        try {
+            const response = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+            });
+
+            const userInfo = response.data; // Lấy thông tin user từ Google API
+            res.status(200).json(userInfo); // Trả về thông tin user
+        } catch (error) {
+            console.error('Error fetching user info:', error.response ? error.response.data : error.message);
+            res.status(500).json({
+                error: 'Failed to fetch user info',
+                details: error.response ? error.response.data : error.message,
+            });
+        }
     }
-
-    // login: async (req, res) => {
-    //     const { email, password } = req.body
-    //     try {
-    //         if (!email || !password) return res.status(400).json({
-    //             err: 1,
-    //             msg: 'Missing inputs !'
-    //         })
-    //         const response = await authService.loginService(req.body)
-    //         return res.status(200).json(response)
-
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             err: -1,
-    //             msg: 'Fail at auth controller: ' + error
-    //         })
-    //     }
-    // }
 }
 
 module.exports = authController

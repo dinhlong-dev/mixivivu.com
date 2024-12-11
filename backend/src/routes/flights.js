@@ -7,4 +7,6 @@ router.get('/', flightsController.getFlight)
 router.delete('/', flightsController.deleteFlight)
 router.get('/search', flightsController.searchFlight)
 
+router.post('/add-many', flightsController.addManyFlight)
+
 module.exports = router

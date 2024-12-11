@@ -1,0 +1,133 @@
+.Dropdown_dropdown__3C5hP {
+    min-width: 500px;
+    width: -moz-fit-content;
+    width: fit-content;
+    padding-top: 10px;
+    position: absolute;
+    inset: 0 auto auto 0;
+    transform: translate3d(0, 70px, 0);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    border-radius: 8px;
+    border: 1px solid var(--gray-100, #f2f4f7);
+    background: var(--base-white, #fff);
+    box-shadow: 0 8px 8px -4px rgba(16, 24, 40, .03), 0 20px 24px -4px rgba(16, 24, 40, .08);
+    z-index: 99;
+    overflow: auto;
+}
+
+.Select_dropdown__WrJgR {
+    width: 100%;
+    min-width: 0;
+    padding-top: 0;
+}
+
+.Select_dropdown-item___li6M {
+    width: 100%;
+    padding: 15px 30px;
+    cursor: pointer;
+}
+
+.Select_dropdown-item___li6M:hover {
+    width: 100%;
+    background: var(--gray-50, #f9fafb);
+}
+
+/* payment */
+.container {
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+}
+
+.Payment_payment-content__GIjbC {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* content payment */
+.Payment_card-header__kV82D {
+    padding: 20px 24px;
+    gap: 16px;
+    border-bottom: 1px solid #eaecf0;
+}
+
+.Payment_card-content__FwSj6 {
+    padding: 20px 24px;
+}
+
+.QrPayment_qr-content__xKdx_ {
+    border-radius: 24px;
+    border: 1px solid #77dada;
+    background: #f3ffff;
+    box-shadow: 0px 1px 2px 0px rgba(16,24,40,.06),0px 1px 3px 0px rgba(16,24,40,.1);
+    padding: 40px;
+}
+
+.Payment_card-footer__cyV4g {
+    padding: 20px 24px;
+    border-top: 1px solid #eaecf0;
+}
+
+/* QR */
+.QrPayment_qr-code__lRIIP {
+    background-color: #77dada;
+    padding: 15px;
+    border-radius: 24px;
+    width: 200px;
+    height: 200px;
+}
+
+.TicketDetail_ticket-detail__t02Gr label {
+    color: #475467;
+}
+
+.TicketDetail_ticket-detail__t02Gr p {
+    min-width: 96px;
+    color: #101828;
+}
+
+.Payment_total-price-pin__ZxZa_ {
+    border-radius: 0;
+    bottom: 0;
+    position: sticky;
+    padding: 20px 32px;
+}
+
+.Payment_total-price-pin__content__H_04z {
+    padding: 0 32px;
+    width: 1280px;
+    max-width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.Button_button-color-destructive__1mG3r {
+    background-color: #f04438;
+    border: 1px solid #f04438;
+    color: #fff;
+    fill: #fff;
+}
+
+.Button_button-normal__y4h10 {
+    padding: 16px 20px;
+    white-space: nowrap;
+}
+
+.Button_button-color-destructive__1mG3r:hover {
+    background-color: #7a271a;
+    border: 1px solid #7a271a;
+    cursor: pointer;
+}
+
+.Button_button-color__7QnYK:hover {
+    background-color: #0e4f4f;
+    color: #fff;
+    cursor: pointer;
+    fill: #fff;
+}

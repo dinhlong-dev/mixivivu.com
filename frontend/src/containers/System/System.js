@@ -7,6 +7,7 @@ import Header from './Header'
 import CreateAirport from './CreateAirport'
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode';
+import Dashboard from './Dashboard'
 
 
 const System = () => {
@@ -30,7 +31,7 @@ const System = () => {
         setIsAuthenticated(true);
       } else {
         // Nếu role không phải admin, điều hướng về trang login
-        navigate('/login'); // Điều hướng đến trang login nếu không phải admin
+        navigate('/'); // Điều hướng đến trang login nếu không phải admin
       }
     } catch (error) {
       console.error("Token không hợp lệ hoặc hết hạn", error);

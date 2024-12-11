@@ -52,13 +52,8 @@ const bookingSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'cancelled']
-    },
-    emailVerified: {
-        type: Boolean
-    },
-    verificationToken: {
-        type: String
+        enum: ['pending', 'confirmed', 'cancelled'],
+        default: "pending"
     },
 })
 
@@ -110,7 +105,7 @@ const flightsSchema = new mongoose.Schema({
     },
     seat_class: {
         type: String,
-        enum: ['Economy', 'Business', 'First'],
+        enum: ['Economy', 'Business', 'First Class'],
         required: true
     },
     carry_on_baggage: {
@@ -158,16 +153,12 @@ const userSchema = new mongoose.Schema({
 })
 
 const paymentSchema = new mongoose.Schema({
-    booking_id: {
-        type: mongoose.Schema.Types.ObjectId, ref: 'Booking'
-    },
-    payment_date: Date,
-    amount: Number,
-    payment_method: String,
-    status: {
-        type: String,
-        emun: ['pending', 'completed', 'failed']
-    }
+    orderId: { type: String, required: true, unique: true }, // Để liên kết với booking
+    bookingId: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking', required: true }, // Liên kết đến booking
+    amount: { type: Number, required: true },
+    paymentMethod: { type: String, enum: ['MOMO', 'CreditCard', 'BankTransfer'], required: true },
+    paymentStatus: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
+    paymentDate: { type: Date, default: Date.now },
 });
 
 let Airport = mongoose.model("Airport", airportSchema)
