@@ -8,4 +8,6 @@ router.post('/callback', paymentController.paymentCallback)
 
 router.post('/transaction-status', paymentController.transactionStatus)
 
+router.delete('/', paymentController.deletePayment)
+
 module.exports = router

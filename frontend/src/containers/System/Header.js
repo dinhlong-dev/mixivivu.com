@@ -13,7 +13,7 @@ const Header = () => {
     <div className="w-full flex justify-center border border-solid border-gray-200">
       <div className="w-1280 flex items-center justify-between bg-white h-24 z-10">
         <div className="flex items-center gap-10">
-          <a href='/admin'>
+          <a href='/admin/dashboard'>
             <img
               src={logo}
               alt="logo"
@@ -21,14 +21,12 @@ const Header = () => {
             />
           </a>
           <ul className="flex text-base gap-6 font-medium">
-            <li className="cursor-pointer py-3">Quản lý tài khoản</li>
+            <a href='/admin/dashboard'><li className="cursor-pointer py-3">Trang chủ</li></a>
             <a href='/admin/flight'><li className="cursor-pointer py-3">Quản lý chuyến bay</li></a>
             <a href='/admin/airline'><li className="cursor-pointer py-3">Quản lý hãng bay</li></a>
             <a href='/admin/airport'><li className="cursor-pointer py-3">Quản lý sân bay</li></a>
-            <li className="cursor-pointer py-3">Blog</li>
           </ul>
         </div>
-
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="w-[16px] h-[16px]">

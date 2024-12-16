@@ -189,7 +189,7 @@ const LayoutMain = () => {
         event.preventDefault();
 
         if (!departureQuery || !arrivalQuery || !departureDate || adults === 0) {
-            console.error("Vui lòng nhập đầy đủ thông tin cần thiết để tìm chuyến bay.");
+            alert("Vui lòng nhập đầy đủ thông tin cần thiết để tìm chuyến bay.");
             return;
         }
 

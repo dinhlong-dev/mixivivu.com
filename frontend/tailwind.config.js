@@ -37,7 +37,10 @@ module.exports = {
       },
       borderColor: {
         button: 'rgb(92% 93% 94%)'
-      }
+      },
+      animation: {
+        running: 'running', // Custom animation for running state
+      },
     },
   },
   plugins: [],

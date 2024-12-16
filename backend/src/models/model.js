@@ -47,6 +47,18 @@ const bookingSchema = new mongoose.Schema({
     booking_date: {
         type: Date,
     },
+    adults: { 
+        type: Number, 
+        default: 0
+    },      
+    children: { 
+        type: Number, 
+        default: 0 
+    },        
+    infants: { 
+        type: Number, 
+        default: 0 
+    },
     total_price: {
         type: Number
     },

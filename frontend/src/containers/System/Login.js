@@ -40,7 +40,10 @@ const Login = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault(); // Ngăn chặn hành động mặc định của form
-    
+
+        if (payload.email === "" && payload.password === "") {
+            alert("Vui lòng nhập email và password")
+        }
         let invalids = validate(payload); // Kiểm tra tính hợp lệ của các trường
         if (invalids === 0) {
             try {
@@ -52,21 +55,21 @@ const Login = () => {
                     },
                     body: JSON.stringify(payload)
                 });
-    
+
                 // Kiểm tra nếu phản hồi từ API là thành công
                 if (!response.ok) {
                     throw new Error('Đăng nhập thất bại, vui lòng thử lại.');
                 }
-    
+
                 const data = await response.json(); // Đảm bảo gọi response.json() một lần
                 console.log('Response data:', data); // Log response data
-    
+
                 if (data.token) {
                     localStorage.setItem('authToken', data.token); // Lưu token vào localStorage
                     setAuthToken(data.token); // Lưu token vào state
                     // Chuyển hướng sau khi đăng nhập thành công
                     try {
-                        navigate('/admin/');
+                        navigate('/admin/dashboard');
                     } catch (error) {
                         console.error('Navigate error:', error);
                     }

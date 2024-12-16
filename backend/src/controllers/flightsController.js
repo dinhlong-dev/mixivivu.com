@@ -4,7 +4,7 @@ const moment = require('moment-timezone')
 const flightsController = {
     // ADD FLIGHT
     addFlight: async (req, res) => {
-        const { flight_number, departure_time } = req.body;
+        const { flight_number } = req.body;
 
         try {
             // Kiểm tra nếu flight_number đã tồn tại
@@ -13,14 +13,6 @@ const flightsController = {
                 return res.status(400).json({
                     error: 'Flight number already exists'
                 });
-            }
-
-            // Chuyển đổi departure_time sang UTC+7 nếu có
-            if (departure_time) {
-                const utcDate = new Date(departure_time); // Tạo đối tượng Date từ chuỗi đầu vào
-                const utcOffset = 7 * 60 * 60 * 1000; // UTC+7 (đổi sang mili giây)
-                const localDate = new Date(utcDate.getTime() + utcOffset); // Cộng thêm 7 giờ
-                req.body.departure_time = localDate.toISOString(); // Lưu lại thời gian đã chuyển đổi
             }
 
             // Tạo chuyến bay mới
@@ -63,8 +55,33 @@ const flightsController = {
     // GET FLIGHT
     getFlight: async (req, res) => {
         try {
-            const flight = await Flight.find();
-            res.status(200).json(flight)
+            const flights = await Flight.find()
+                .populate('departure_airport')
+                .populate('arrival_airport')
+                .populate('airline');
+
+            const adjustedFlights = flights.map(flight => {
+                // Convert departure_date và arrival_date từ UTC sang UTC+7
+                const departureDate = new Date(flight.departure_date);
+                const arrivalDate = new Date(flight.arrival_date);
+
+                // Thêm 7 giờ cho múi giờ UTC+7
+                const OFFSET_MS = 7 * 60 * 60 * 1000; // 7 giờ * 60 phút * 60 giây * 1000 mili giây
+
+                // Tạo lại đối tượng Date với múi giờ UTC+7
+                const adjustedDepartureDate = new Date(departureDate.getTime() - OFFSET_MS);
+                const adjustedArrivalDate = new Date(arrivalDate.getTime() - OFFSET_MS);
+
+                // Cập nhật lại các trường với thời gian đã điều chỉnh
+                return {
+                    ...flight.toObject(),
+                    departure_date: adjustedDepartureDate.toISOString(),
+                    arrival_date: adjustedArrivalDate.toISOString(),
+                };
+            });
+
+            // Trả về kết quả với các chuyến bay đã được điều chỉnh múi giờ
+            res.status(200).json(adjustedFlights);
         } catch (error) {
             res.status(500).json(error)
         }
@@ -301,6 +318,61 @@ const flightsController = {
         } catch (error) {
             console.error('Error fetching flights:', error);  // Log lỗi chi tiết
             res.status(500).json({ message: 'Error fetching flights', error });
+        }
+    },
+
+    // API tìm chuyến bay theo flight_number
+    getFlightByNumber: async (req, res) => {
+        const { query } = req.query;  // Lấy tham số query từ URL
+
+        if (!query) {
+            return res.status(400).json({
+                error: 'Query parameter is required'
+            });
+        }
+
+        try {
+            const flights = await Flight.find({
+                $or: [
+                    { flight_number: { $regex: query, $options: 'i' } },  // Tìm theo số chuyến bay
+                    { 'departure_airport.code': { $regex: query, $options: 'i' } },  // Tìm theo mã sân bay đi
+                    { 'arrival_airport.code': { $regex: query, $options: 'i' } },  // Tìm theo mã sân bay đến
+                    { 'airline.name': { $regex: query, $options: 'i' } }  // Tìm theo tên hãng hàng không
+                ]
+            }).populate('departure_airport')  // Đưa thông tin sân bay đi
+                .populate('arrival_airport')    // Đưa thông tin sân bay đến
+                .populate('airline')            // Đưa thông tin hãng hàng không
+                .limit(10);  // Giới hạn kết quả tìm kiếm
+
+            res.json(flights);
+        } catch (err) {
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+
+    getFlightsByAirlineIds: async (req, res) => {
+        const { airlineIds } = req.query; // Nhận danh sách các airlineId từ query
+
+        if (!airlineIds || airlineIds.length === 0) {
+            return res.status(400).json({
+                error: 'Airline ID(s) query parameter is required'
+            });
+        }
+
+        try {
+            // Tìm chuyến bay có airline nằm trong danh sách airlineIds
+            const flights = await Flight.find({ 'airline': { $in: airlineIds } })
+                .populate('departure_airport')
+                .populate('arrival_airport')
+                .populate('airline');
+
+            if (flights.length === 0) {
+                return res.status(404).json({ message: 'Không có chuyến bay nào cho các hãng bay này.' });
+            }
+
+            res.status(200).json(flights); // Trả về kết quả chuyến bay
+        } catch (err) {
+            res.status(500).json({ error: 'Internal server error' });
         }
     }
 }

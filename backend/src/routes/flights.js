@@ -9,4 +9,8 @@ router.get('/search', flightsController.searchFlight)
 
 router.post('/add-many', flightsController.addManyFlight)
 
+router.get('/search-by-number', flightsController.getFlightByNumber)
+
+router.get('/airlines', flightsController.getFlightsByAirlineIds)
+
 module.exports = router

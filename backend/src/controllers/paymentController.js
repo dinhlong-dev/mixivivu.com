@@ -19,7 +19,7 @@ const Payments = {
             var orderInfo = `Payment for flight ${flight_id} for customer ${email}`;
             var partnerCode = 'MOMO';
             var redirectUrl = process.env.REDIRECT_URI // Địa chỉ trang sau khi thanh toán
-            var ipnUrl = 'https://8964-103-156-46-86.ngrok-free.app/callback'; // Callback URL để nhận kết quả thanh toán
+            var ipnUrl = 'https://fe28-171-251-2-210.ngrok-free.app/v1/payment/callback'; // Callback URL để nhận kết quả thanh toán
             var requestType = "payWithMethod";
             var orderId = partnerCode + new Date().getTime();
             var requestId = orderId;  // Mỗi yêu cầu thanh toán sẽ có một ID duy nhất
@@ -99,67 +99,89 @@ const Payments = {
     },
 
     paymentCallback: async (req, res) => {
+        console.log(req.body);
+        const accessKey = 'F8BBA842ECF85';
+        const secretKey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
+
+        const { orderId } = req.body; // Lấy orderId từ request body
+
+        const payment = await Payment.findOne({ orderId });
+
+        if (!payment) {
+            return res.status(404).json({ msg: 'Payment not found' });
+        }
+
+        // Tạo rawSignature từ các tham số nhận được từ MoMo
+        const rawSignature = `accessKey=${accessKey}&orderId=${orderId}&partnerCode=MOMO&requestId=${orderId}`;
+        const signature = crypto
+            .createHmac('sha256', secretKey)
+            .update(rawSignature)
+            .digest('hex');
+
+        const requestBody = JSON.stringify({
+            partnerCode: 'MOMO',
+            requestId: orderId,
+            orderId: orderId,
+            signature: signature,
+            lang: 'vi',
+        });
+
+        // Gửi request đến MoMo để kiểm tra trạng thái giao dịch
+        const options = {
+            method: 'POST',
+            url: 'https://test-payment.momo.vn/v2/gateway/api/query',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: requestBody,
+        };
+
         try {
-            console.log("Callback received from MoMo:");
-            console.log(req.body);
+            // Lấy kết quả từ MoMo
+            const result = await axios(options);
 
-            // Nhận thông tin từ MoMo
-            const { partnerCode, orderId, requestId, amount, orderInfo, transId, resultCode, message, signature } = req.body;
+            // Lấy thông tin thanh toán từ kết quả trả về
+            const { resultCode, message, orderId: responseOrderId } = result.data;
 
-            // Kiểm tra chữ ký để xác thực yêu cầu
-            const accessKey = 'F8BBA842ECF85';
-            const secretKey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
-
-            const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&payType=qr&requestId=${requestId}&resultCode=${resultCode}&transId=${transId}`;
-
-            // Tạo chữ ký mới để so sánh với chữ ký từ MoMo
-            const generatedSignature = crypto
-                .createHmac('sha256', secretKey)
-                .update(rawSignature)
-                .digest('hex');
-
-            if (signature !== generatedSignature) {
-                return res.status(400).json({ msg: 'Invalid signature' });
-            }
-
+            // Kiểm tra kết quả thanh toán và cập nhật trạng thái
             let paymentStatus = 'pending';
             let bookingStatus = 'pending';
 
-            // Kiểm tra resultCode và cập nhật trạng thái
             if (resultCode === 0) {
-                paymentStatus = 'confirmed'; // Thanh toán thành công
-                bookingStatus = 'confirmed'; // Cập nhật trạng thái booking thành confirmed
+                paymentStatus = 'confirmed';
+                bookingStatus = 'confirmed';
             } else {
-                paymentStatus = 'cancelled'; // Thanh toán thất bại
-                bookingStatus = 'cancelled'; // Cập nhật trạng thái booking thành cancelled
+                paymentStatus = 'cancelled';
+                bookingStatus = 'cancelled';
             }
 
-            // Cập nhật trạng thái thanh toán trong bảng Payment
+            // Cập nhật trạng thái thanh toán trong database
             const payment = await Payment.findOneAndUpdate(
-                { orderId: orderId },
-                { status: paymentStatus }, // Cập nhật trạng thái và transId
+                { orderId: responseOrderId },
+                { paymentStatus: paymentStatus },
                 { new: true }
             );
 
-            // Cập nhật trạng thái booking trong bảng Booking
-            const booking = await Booking.findOneAndUpdate(
-                { _id: payment.bookingId }, // Tìm booking dựa trên bookingId trong bảng Payment
-                { status: bookingStatus },  // Cập nhật trạng thái booking
-                { new: true }
-            );
+            if (payment && payment.bookingId) {
+                await Booking.findOneAndUpdate(
+                    { _id: payment.bookingId },
+                    { status: bookingStatus },
+                    { new: true }
+                );
+            }
 
             // Trả về kết quả cho frontend
             return res.status(200).json({
-                status: bookingStatus, 
+                status: paymentStatus,
                 message: message,
                 payment,
-                booking,
             });
         } catch (error) {
-            console.error(error);
+            console.error('Error checking transaction status:', error);
             return res.status(500).json({
                 statusCode: 500,
                 msg: 'Server error',
+                error: error.message,
             });
         }
     },
@@ -169,6 +191,12 @@ const Payments = {
         const secretKey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
 
         const { orderId } = req.body; // Lấy orderId từ request body
+
+        const payment = await Payment.findOne({ orderId });
+
+        if (!payment) {
+            return res.status(404).json({ msg: 'Payment not found' });
+        }
 
         // Tạo chữ ký (signature) theo yêu cầu của MoMo
         const rawSignature = `accessKey=${accessKey}&orderId=${orderId}&partnerCode=MOMO&requestId=${orderId}`;
@@ -205,10 +233,14 @@ const Payments = {
 
             // Kiểm tra kết quả thanh toán và cập nhật trạng thái
             let paymentStatus = 'pending';
+            let bookingStatus = 'pending';
+
             if (resultCode === 0) {
-                paymentStatus = 'confirmed'; // Thanh toán thành công
+                paymentStatus = 'confirmed';
+                bookingStatus = 'confirmed';
             } else {
-                paymentStatus = 'cancelled'; // Thanh toán thất bại
+                paymentStatus = 'cancelled';
+                bookingStatus = 'cancelled';
             }
 
             // Cập nhật trạng thái thanh toán trong database
@@ -217,6 +249,14 @@ const Payments = {
                 { paymentStatus: paymentStatus },
                 { new: true }
             );
+
+            if (payment && payment.bookingId) {
+                await Booking.findOneAndUpdate(
+                    { _id: payment.bookingId },
+                    { status: bookingStatus },
+                    { new: true }
+                );
+            }
 
             // Trả về kết quả cho frontend
             return res.status(200).json({
@@ -231,6 +271,21 @@ const Payments = {
                 msg: 'Server error',
                 error: error.message,
             });
+        }
+    },
+
+    deletePayment: async (req, res) => {
+        try {
+            const deletePayment = await Payment.deleteMany()
+            res.status(200).json({
+                msg: "Delete Compled",
+                deletePayment
+            })
+        } catch (error) {
+            res.status(500).json({
+                error,
+                msg: "loi khi xoa Payment"
+            })
         }
     }
 }
