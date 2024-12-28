@@ -13,4 +13,6 @@ router.get('/search-by-number', flightsController.getFlightByNumber)
 
 router.get('/airlines', flightsController.getFlightsByAirlineIds)
 
+router.delete('/delete-id/:id', flightsController.deleteFlightById)
+
 module.exports = router

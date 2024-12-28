@@ -321,6 +321,99 @@ const flightsController = {
         }
     },
 
+    // searchFlight: async (req, res) => {
+    //     const { from, to, departureDate, returnDate, adults, children, infants } = req.query;
+
+    //     // Hàm điều chỉnh thời gian bằng cách trừ một số giờ
+    //     const adjustTimeByHours = (date, hours) => {
+    //         const adjustedDate = new Date(date);
+    //         adjustedDate.setHours(adjustedDate.getHours() - hours);  // Trừ đi số giờ
+    //         return adjustedDate;
+    //     }
+
+    //     try {
+    //         const totalPassengers = parseInt(adults) + parseInt(children) + parseInt(infants);
+
+    //         // Chuyển đổi chuỗi ngày thành đối tượng Date và đặt thời gian bằng 00:00:00 để đảm bảo sự chính xác khi so sánh
+    //         const departureDateStart = new Date(departureDate);
+    //         departureDateStart.setHours(0, 0, 0, 0);
+
+    //         const departureDateEnd = new Date(departureDate);
+    //         departureDateEnd.setHours(23, 59, 59, 999);
+
+    //         // Tìm chuyến bay đi
+    //         let departureFlights = await Flight.find({
+    //             departure_airport: from,
+    //             arrival_airport: to,
+    //             available_seats: { $gte: totalPassengers },
+    //             departure_date: { $gte: departureDateStart, $lt: departureDateEnd } // Tạo khoảng ngày để so sánh
+    //         }).populate('departure_airport arrival_airport airline');
+
+    //         if (!departureFlights || departureFlights.length === 0) {
+    //             return res.json({ message: 'Không có chuyến bay nào vào ngày này' }); // Trả về thông báo thay vì lỗi
+    //         }
+
+    //         // Tính tổng giá cho mỗi chuyến bay đi và điều chỉnh thời gian đi
+    //         departureFlights = departureFlights.map(flight => {
+    //             const totalPrice = (flight.price_adult * parseInt(adults)) +
+    //                 (flight.price_child * parseInt(children)) +
+    //                 (flight.price_infant * parseInt(infants));
+
+    //             // Điều chỉnh thời gian đi và đến
+    //             flight.departure_date = adjustTimeByHours(flight.departure_date, 7);
+    //             flight.arrival_date = adjustTimeByHours(flight.arrival_date, 7);
+
+    //             return { ...flight.toObject(), totalPrice };  // Thêm trường totalPrice và thời gian đã điều chỉnh
+    //         });
+
+    //         // Nếu có ngày về (khứ hồi)
+    //         if (returnDate) {
+    //             const returnDateStart = new Date(returnDate);
+    //             returnDateStart.setHours(0, 0, 0, 0);
+
+    //             const returnDateEnd = new Date(returnDate);
+    //             returnDateEnd.setHours(23, 59, 59, 999);
+
+    //             let returnFlights = await Flight.find({
+    //                 departure_airport: to,
+    //                 arrival_airport: from,
+    //                 available_seats: { $gte: totalPassengers },
+    //                 departure_date: { $gte: returnDateStart, $lt: returnDateEnd } // Tạo khoảng ngày để so sánh
+    //             }).populate('departure_airport arrival_airport airline');
+
+    //             if (!returnFlights || returnFlights.length === 0) {
+    //                 console.log('No return flights found, returning only departure flights');
+    //                 return res.json({
+    //                     departureFlights,
+    //                     returnFlights: 'không tìm thấy chuyến bay về'
+    //                 });  // Không tìm thấy chuyến bay về, trả về chỉ chuyến bay đi
+    //             }
+
+    //             // Tính tổng giá cho mỗi chuyến bay về và điều chỉnh thời gian đi và đến
+    //             returnFlights = returnFlights.map(flight => {
+    //                 const totalPrice = (flight.price_adult * parseInt(adults)) +
+    //                     (flight.price_child * parseInt(children)) +
+    //                     (flight.price_infant * parseInt(infants));
+
+    //                 // Điều chỉnh thời gian đi và đến
+    //                 flight.departure_date = adjustTimeByHours(flight.departure_date, 7);
+    //                 flight.arrival_date = adjustTimeByHours(flight.arrival_date, 7);
+
+    //                 return { ...flight.toObject(), totalPrice };  // Thêm trường totalPrice và thời gian đã điều chỉnh
+    //             });
+
+    //             return res.json({ departureFlights, returnFlights });
+    //         }
+
+    //         // Trả về chuyến bay một chiều với giá vé và thời gian đã điều chỉnh
+    //         res.json({ departureFlights });
+
+    //     } catch (error) {
+    //         console.error('Error fetching flights:', error);  // Log lỗi chi tiết
+    //         res.status(500).json({ message: 'Error fetching flights', error });
+    //     }
+    // },
+
     // API tìm chuyến bay theo flight_number
     getFlightByNumber: async (req, res) => {
         const { query } = req.query;  // Lấy tham số query từ URL
@@ -373,6 +466,23 @@ const flightsController = {
             res.status(200).json(flights); // Trả về kết quả chuyến bay
         } catch (err) {
             res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+
+    deleteFlightById: async (req, res) => {
+        try {
+            const flightId = req.params.id;
+
+            // Tìm và xóa sân bay
+            const deletedFlight = await Flight.findByIdAndDelete(flightId);
+
+            if (!deletedFlight) {
+                return res.status(404).json({ message: 'Chuyến bay không tồn tại' });
+            }
+
+            res.status(200).json({ message: 'Xóa chuyến bay thành công', data: deletedFlight });
+        } catch (error) {
+            res.status(500).json({ message: 'Có lỗi xảy ra khi xóa chuyến bay', error: error.message });
         }
     }
 }

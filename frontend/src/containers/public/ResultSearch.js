@@ -144,7 +144,7 @@ const ResultSeach = () => {
     if (searchInfo?.arrivalQuery) setArrivalQuery(searchInfo.arrivalQuery);
     if (searchInfo?.departureDate) setDepartureDate(searchInfo.departureDate);
     if (searchInfo?.returnDate) setReturnDate(searchInfo.returnDate);
-  })
+  }, [])
 
   // Hàm handle khi click vào một chiều
   const handleButtonClick = () => {
@@ -185,7 +185,6 @@ const ResultSeach = () => {
 
   const handleButtonNotOpenClickReturn = (e, flight) => {
     e.stopPropagation();
-    setIsActive(!isActive)
     if (selectedFlightIdReturn === flight._id) {
       // Nếu nhấn vào vé đã chọn, hủy chọn và hiển thị tất cả vé
       setSelectedFlightIdReturn(null);
@@ -224,20 +223,18 @@ const ResultSeach = () => {
     : flights;
 
   // ------------------------------------
-  const { dropdownOpen: dropdownOpenAdult, toggleDropdown: toggleDropdownAdult, dropdownRefs: dropdownRefAdult } = useDropdown(adults);
-  const { dropdownOpen: dropdownOpenChild, toggleDropdown: toggleDropdownChild, dropdownRefs: dropdownRefChild } = useDropdown(children);
-  const { dropdownOpen: dropdownOpenInfant, toggleDropdown: toggleDropdownInfant, dropdownRefs: dropdownRefInfant } = useDropdown(infants);
+  const [dropdownOpenAdult, setDropdownOpenAdult] = useState([]);
+  const [dropdownOpenChild, setDropdownOpenChild] = useState([]);
+  const [dropdownOpenInfant, setDropdownOpenInfant] = useState([]);
 
   const [selectedGenderAdult, setSelectedGenderAdult] = useState(Array(adults).fill('Nam'));
   const [selectedGenderChild, setSelectedGenderChild] = useState(Array(children).fill('Nam'));
   const [selectedGenderInfant, setSelectedGenderInfant] = useState(Array(infants).fill('Nam'));
 
-
   // State để lưu thông tin khách hàng
-  const [adultInfo, setAdultInfo] = useState(Array(adults).fill({ gender: '', firstName: '', lastName: '', dob: '', idCard: '', idExpiry: '' }));
-  const [childInfo, setChildInfo] = useState(Array(children).fill({ gender: '', firstName: '', lastName: '', dob: '' }));
-  const [infantInfo, setInfantInfo] = useState(Array(infants).fill({ gender: '', firstName: '', lastName: '', dob: '' }));
-
+  const [adultInfo, setAdultInfo] = useState(Array(adults).fill({ gender: 'Nam', firstName: '', lastName: '', dob: '', idCard: '', idExpiry: '' }));
+  const [childInfo, setChildInfo] = useState(Array(children).fill({ gender: 'Nam', firstName: '', lastName: '', dob: '' }));
+  const [infantInfo, setInfantInfo] = useState(Array(infants).fill({ gender: 'Nam', firstName: '', lastName: '', dob: '' }));
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -247,76 +244,117 @@ const ResultSeach = () => {
     return `${day}/${month}/${year}`;
   };
 
+  const toggleDropdownAdult = (index) => {
+    setDropdownOpenAdult((prevState) => {
+      const updated = [...prevState];
+      updated[index] = !updated[index];
+      return updated;
+    });
+  };
+
+  const toggleDropdownChild = (index) => {
+    setDropdownOpenChild((prevState) => {
+      const updated = [...prevState];
+      updated[index] = !updated[index];
+      return updated;
+    });
+  };
+
+  const toggleDropdownInfant = (index) => {
+    setDropdownOpenInfant((prevState) => {
+      const updated = [...prevState];
+      updated[index] = !updated[index];
+      return updated;
+    });
+  };
+
   // Hàm cập nhật thông tin khách hàng
   const handleInputChange = (e, category, index, field) => {
     const value = e.target.value;
     if (category === 'adult') {
-      setAdultInfo((prev) =>
-        prev.map((item, i) =>
-          i === index ? { ...item, [field]: value } : item
-        )
+      setAdultInfo(prev =>
+        prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
       );
     } else if (category === 'child') {
-      setChildInfo((prev) =>
-        prev.map((item, i) =>
-          i === index ? { ...item, [field]: value } : item
-        )
+      setChildInfo(prev =>
+        prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
       );
     } else if (category === 'infant') {
-      setInfantInfo((prev) =>
-        prev.map((item, i) =>
-          i === index ? { ...item, [field]: value } : item
-        )
+      setInfantInfo(prev =>
+        prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
       );
     }
   };
 
   const handleGenderSelect = (index, gender, type) => {
-    console.log("Selected gender:", gender);
-
-    if (index < 0 || (type !== 'adult' && type !== 'child' && type !== 'infant')) {
-      console.error('Invalid index or type');
-      return;
-    }
-
     if (type === 'adult') {
-      setSelectedGenderAdult((prevState) => {
-        const updatedGender = [...prevState];
-        updatedGender[index] = gender;
-        return updatedGender;
-      });
+      // Cập nhật giới tính vào selectedGenderAdult
+      const updatedGender = [...selectedGenderAdult];
+      updatedGender[index] = gender;
+      setSelectedGenderAdult(updatedGender);
+  
+      // Cập nhật giới tính vào adultInfo
+      setAdultInfo((prevState) =>
+        prevState.map((item, i) =>
+          i === index ? { ...item, gender } : item
+        )
+      );
+      
+      // Đóng dropdown sau khi chọn giới tính
       toggleDropdownAdult(index);
     } else if (type === 'child') {
-      setSelectedGenderChild((prevState) => {
-        const updatedGender = [...prevState];
-        updatedGender[index] = gender;
-        return updatedGender;
-      });
+      // Cập nhật giới tính vào selectedGenderChild
+      const updatedGender = [...selectedGenderChild];
+      updatedGender[index] = gender;
+      setSelectedGenderChild(updatedGender);
+  
+      // Cập nhật giới tính vào childInfo
+      setChildInfo((prevState) =>
+        prevState.map((item, i) =>
+          i === index ? { ...item, gender } : item
+        )
+      );
+  
+      // Đóng dropdown sau khi chọn giới tính
       toggleDropdownChild(index);
     } else if (type === 'infant') {
-      setSelectedGenderInfant((prevState) => {
-        const updatedGender = [...prevState];
-        updatedGender[index] = gender;
-        return updatedGender;
-      });
+      // Cập nhật giới tính vào selectedGenderInfant
+      const updatedGender = [...selectedGenderInfant];
+      updatedGender[index] = gender;
+      setSelectedGenderInfant(updatedGender);
+  
+      // Cập nhật giới tính vào infantInfo
+      setInfantInfo((prevState) =>
+        prevState.map((item, i) =>
+          i === index ? { ...item, gender } : item
+        )
+      );
+  
+      // Đóng dropdown sau khi chọn giới tính
       toggleDropdownInfant(index);
     }
   };
+  
 
   useEffect(() => {
-    console.log("Updated adult genders:", selectedGenderAdult);
-  }, [selectedGenderAdult]); // Log only when selectedGenderAdult changes
+    console.log("Updated adultInfo: ", adultInfo);
+  }, [adultInfo]);  // Sẽ log lại giá trị mỗi khi adultInfo thay đổi
+  
 
-  useEffect(() => {
-    console.log("Updated child genders:", selectedGenderChild);
-  }, [selectedGenderChild]); // Log only when selectedGenderChild changes
+  // useEffect(() => {
+  //   console.log("Updated adult genders:", selectedGenderAdult);
+  // }, [selectedGenderAdult]); // Log only when selectedGenderAdult changes
 
-  useEffect(() => {
-    console.log("Updated infant genders:", selectedGenderInfant);
-  }, [selectedGenderInfant]);
+  // useEffect(() => {
+  //   console.log("Updated child genders:", selectedGenderChild);
+  // }, [selectedGenderChild]); // Log only when selectedGenderChild changes
+
+  // useEffect(() => {
+  //   console.log("Updated infant genders:", selectedGenderInfant);
+  // }, [selectedGenderInfant]);
 
   const [contactInfo, setContactInfo] = useState({
-    gender: '',
+    gender: 'Ông',
     firstName: '',
     lastName: '',
     phoneNumber: '',
@@ -443,6 +481,10 @@ const ResultSeach = () => {
         children: children,
         infants: infants,
         total_price: total_price,
+        phone_number: contactInfo.phoneNumber,
+        adultInfo: adultInfo,
+        childInfo: childInfo,
+        infantInfo: infantInfo,
       });
 
       if (response.data.booking) {
@@ -506,7 +548,7 @@ const ResultSeach = () => {
       {showToast && message && (
         <div className="Toastify">
           <div className="Toastify__toast-container Toastify__toast-container--top-center z-[100000]">
-            <div id="6" className="Toastify__toast Toastify__toast-theme--light Toastify__toast--error Toastify__toast--close-on-click "
+            <div className="Toastify__toast Toastify__toast-theme--light Toastify__toast--error Toastify__toast--close-on-click "
             >
               <div role="alert" className="Toastify__toast-body">
                 <div className="Toastify__toast-icon Toastify--animate-icon Toastify__zoom-enter">
@@ -562,8 +604,8 @@ const ResultSeach = () => {
                         </button>
                       </div>
                     </div>
-                    <label for=":r13:" className=" Checkbox_container__ccFUl w-fit flex gap-2 items-start cursor-pointer">
-                      <input className='w-0 h-0 absolute opacity-0' id=":r13:" type="checkbox" name="type" />
+                    <label className=" Checkbox_container__ccFUl w-fit flex gap-2 items-start cursor-pointer">
+                      <input className='w-0 h-0 absolute opacity-0' type="checkbox" name="type" />
                       <span className="Checkbox_checkmark__81gnF Checkbox_sm__nLRCs">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                       </span>
@@ -1024,7 +1066,7 @@ const ResultSeach = () => {
                           <div>
                             <div className='flex justify-center gap-3 px-6 py-4 overflow-auto max-w-full'>
                               <div className='FlightCalendar_flight-calendar-item__1IeW2  cursor-pointer'>
-                                <div className='text-[#475467]'>Thứ 3</div>
+                                <div className='text-[#475467]'>Thứ 2</div>
                                 <div className='subheading md FlightCalendar_date__THTRM'>26</div>
                               </div>
                               <div className='FlightCalendar_flight-calendar-item__1IeW2  cursor-pointer'>
@@ -1032,22 +1074,22 @@ const ResultSeach = () => {
                                 <div className='subheading md FlightCalendar_date__THTRM'>26</div>
                               </div>
                               <div className='FlightCalendar_flight-calendar-item__1IeW2  cursor-pointer'>
-                                <div className='text-[#475467]'>Thứ 3</div>
+                                <div className='text-[#475467]'>Thứ 4</div>
                                 <div className='subheading md FlightCalendar_date__THTRM'>26</div>
                               </div>
                               <div className='FlightCalendar_flight-calendar-item__1IeW2  cursor-pointer'>
-                                <div className='text-[#475467]'>Thứ 3</div>
+                                <div className='text-[#475467]'>Thứ 5</div>
                                 <div className='subheading md FlightCalendar_date__THTRM'>26</div>
                               </div>
                               <div className='FlightCalendar_flight-calendar-item__1IeW2  cursor-pointer'>
-                                <div className='text-[#475467]'>Thứ 3</div>
+                                <div className='text-[#475467]'>Thứ 6</div>
                                 <div className='subheading md FlightCalendar_date__THTRM'>26</div>
                               </div>
                             </div>
                             {flights?.returnFlights && flights.returnFlights.length > 0 ? (
                               <div className='flex flex-col gap-4 px-6 py-4'>
                                 <div className='flex flex-col gap-4'>
-                                  {flights.returnFlights.map(flights => (
+                                  {flights?.returnFlights && flights.returnFlights.map(flights => (
                                     <div key={flights._id} className={`Card_card__rC1zg ${selectedFlightIdReturn && selectedFlightIdReturn !== flights._id ? 'hidden' : ''}`}>
                                       <div
                                         onClick={() => { handleClick(flights._id) }}
@@ -1216,60 +1258,62 @@ const ResultSeach = () => {
                         <div className="flex flex-col gap-6">
                           {Array.from({ length: adults }).map((_, index) => (
                             <>
-                              <div key={index} className="flex gap-4 items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                <div className="flex flex-col gap-1">
-                                  <label className="sm">Người lớn</label>
-                                  <p className="md">Hành khách {index + 1}</p>
-                                </div>
-                              </div>
-                              <div key={index} className="grid grid-cols-3 gap-4 CustomerInfo_input-group__U1xTl">
-                                <div className="CustomerInfo_selectInput__Mwxef">
-                                  <div className="relative" ref={(el) => (dropdownRefAdult.current[index] = el)}>
-                                    <div className=" ">
-                                      <label for=":r1i:" className="Input_input-group__6PMfq" onClick={(e) => { e.stopPropagation(); toggleDropdownAdult(index); }}>
-                                        <input id=":r1i:" className="p-md" type="button" value={selectedGenderAdult[index]} />
-                                        <svg className='stroke-[#98a2b3]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                        <label for=":r1i:" className="sm "></label>
-                                      </label>
-                                    </div>
-                                    {dropdownOpenAdult[index] && (
-                                      <div className="Dropdown_dropdown__3C5hP Select_dropdown__WrJgR">
-                                        <div className="Select_dropdown-item___li6M" onClick={() => handleGenderSelect(index, "Nam", 'adult')}>Nam</div>
-                                        <div className="Select_dropdown-item___li6M" onClick={() => handleGenderSelect(index, "Nữ", 'adult')}>Nữ</div>
-                                      </div>
-                                    )}
+                              <div key={index}>
+                                <div className="flex gap-4 items-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 20C5.33579 17.5226 8.50702 16 12 16C15.493 16 18.6642 17.5226 21 20M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                  <div className="flex flex-col gap-1">
+                                    <label className="sm">Người lớn</label>
+                                    <p className="md">Hành khách {index + 1}</p>
                                   </div>
                                 </div>
-                                <div className=" ">
-                                  <label for=":r1j:" className="Input_input-group__6PMfq">
-                                    <input id=":r1j:" className="p-md" placeholder="Nhập họ" value={adults.lastName} onChange={(e) => handleInputChange(e, 'adult', index, 'lastName')} />
-                                    <label for=":r1j:" className="sm Input_required__eYDG_">Họ</label>
-                                  </label>
-                                </div>
-                                <div className=" ">
-                                  <label for=":r1k:" className="Input_input-group__6PMfq">
-                                    <input id=":r1k:" className="p-md" placeholder="Nhập tên đệm và tên" value={adults.firstName} onChange={(e) => handleInputChange(e, 'adult', index, 'firstName')} />
-                                    <label for=":r1k:" className="sm Input_required__eYDG_">Tên đệm và tên</label>
-                                  </label>
-                                </div>
-                                <div className=" ">
-                                  <label for=":r1l:" className="Input_input-group__6PMfq">
-                                    <input id=":r1l:" className="p-md" type="date" onChange={(e) => handleInputChange(e, 'adult', index, 'dob')} />
-                                    <label for=":r1l:" className="sm Input_required__eYDG_">Ngày sinh</label>
-                                  </label>
-                                </div>
-                                <div className=" ">
-                                  <label for=":r1m:" className="Input_input-group__6PMfq">
-                                    <input className="p-md" placeholder="Nhập CCCD" value={adults.idCard} onChange={(e) => handleInputChange(e, 'adult', index, 'idCard')} />
-                                    <label for=":r1m:" className="sm Input_required__eYDG_">CCCD</label>
-                                  </label>
-                                </div>
-                                <div className=" ">
-                                  <label for=":r1n:" className="Input_input-group__6PMfq">
-                                    <input id=":r1n:" className="p-md" type="date" onChange={(e) => handleInputChange(e, 'adult', index, 'idExpiry')} />
-                                    <label for=":r1n:" className="sm Input_required__eYDG_">Ngày hết hạn CCCD</label>
-                                  </label>
+                                <div className="grid grid-cols-3 gap-4 CustomerInfo_input-group__U1xTl">
+                                  <div className="CustomerInfo_selectInput__Mwxef">
+                                    <div className="relative">
+                                      <div className=" ">
+                                        <label className="Input_input-group__6PMfq" onClick={() => toggleDropdownAdult(index)}>
+                                          <input className="p-md" type="button" value={selectedGenderAdult[index]} />
+                                          <svg className='stroke-[#98a2b3]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                          <label className="sm "></label>
+                                        </label>
+                                      </div>
+                                      {dropdownOpenAdult[index] && (
+                                        <div className="Dropdown_dropdown__3C5hP Select_dropdown__WrJgR">
+                                          <div className="Select_dropdown-item___li6M" onClick={() => handleGenderSelect(index, "Nam", 'adult')}>Nam</div>
+                                          <div className="Select_dropdown-item___li6M" onClick={() => handleGenderSelect(index, "Nữ", 'adult')}>Nữ</div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className=" ">
+                                    <label className="Input_input-group__6PMfq">
+                                      <input className="p-md" placeholder="Nhập họ" value={adults.lastName} onChange={(e) => handleInputChange(e, 'adult', index, 'lastName')} />
+                                      <label className="sm Input_required__eYDG_">Họ</label>
+                                    </label>
+                                  </div>
+                                  <div className=" ">
+                                    <label className="Input_input-group__6PMfq">
+                                      <input className="p-md" placeholder="Nhập tên đệm và tên" value={adults.firstName} onChange={(e) => handleInputChange(e, 'adult', index, 'firstName')} />
+                                      <label className="sm Input_required__eYDG_">Tên đệm và tên</label>
+                                    </label>
+                                  </div>
+                                  <div className=" ">
+                                    <label className="Input_input-group__6PMfq">
+                                      <input className="p-md" type="date" onChange={(e) => handleInputChange(e, 'adult', index, 'dob')} />
+                                      <label className="sm Input_required__eYDG_">Ngày sinh</label>
+                                    </label>
+                                  </div>
+                                  <div className=" ">
+                                    <label className="Input_input-group__6PMfq">
+                                      <input className="p-md" placeholder="Nhập CCCD" value={adults.idCard} onChange={(e) => handleInputChange(e, 'adult', index, 'idCard')} />
+                                      <label className="sm Input_required__eYDG_">CCCD</label>
+                                    </label>
+                                  </div>
+                                  <div className=" ">
+                                    <label className="Input_input-group__6PMfq">
+                                      <input className="p-md" type="date" onChange={(e) => handleInputChange(e, 'adult', index, 'idExpiry')} />
+                                      <label className="sm Input_required__eYDG_">Ngày hết hạn CCCD</label>
+                                    </label>
+                                  </div>
                                 </div>
                               </div>
                             </>
@@ -1296,10 +1340,10 @@ const ResultSeach = () => {
                             <div className="CustomerInfo_selectInput__Mwxef">
                               <div className="relative">
                                 <div className=" ">
-                                  <label for=":r1o:" className="Input_input-group__6PMfq">
-                                    <input id=":r1o:" className="p-md" type="button" value="Chọn hành lý ký gửi" />
+                                  <label className="Input_input-group__6PMfq">
+                                    <input className="p-md" type="button" value="Chọn hành lý ký gửi" />
                                     <svg className='stroke-[#3C4046]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                    <label for=":r1o:" className="sm "></label>
+                                    <label className="sm "></label>
                                   </label>
                                 </div>
                               </div>
@@ -1317,9 +1361,9 @@ const ResultSeach = () => {
                                 </div>
                               </div>
                               <div className="grid grid-cols-3 gap-4 CustomerInfo_input-group__U1xTl">
-                                <div className="relative" ref={(el) => (dropdownRefChild.current[index] = el)}>
+                                <div className="relative">
                                   <div className=" ">
-                                    <label className="Input_input-group__6PMfq" onClick={(e) => { e.stopPropagation(); toggleDropdownChild(index); }}>
+                                    <label className="Input_input-group__6PMfq" onClick={() => toggleDropdownChild(index)}>
                                       <input className="p-md" type="button" value={selectedGenderChild[index]} />
                                       <svg className='stroke-[#98a2b3]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                       <label className="sm "></label>
@@ -1333,39 +1377,33 @@ const ResultSeach = () => {
                                   )}
                                 </div>
                                 <div className=" ">
-                                  <label for=":r3e:" className="Input_input-group__6PMfq">
+                                  <label className="Input_input-group__6PMfq">
                                     <input
-                                      id=":r3e:"
+
                                       className="p-md"
                                       placeholder="Nhập họ"
                                       value={children.lastName}
                                       onChange={(e) => handleInputChange(e, 'child', index, 'lastName')}
                                     />
-                                    <label for=":r3e:" className="sm ">Họ</label>
+                                    <label className="sm ">Họ</label>
                                   </label>
                                 </div>
                                 <div className=" ">
-                                  <label for=":r3f:" className="Input_input-group__6PMfq">
+                                  <label className="Input_input-group__6PMfq">
                                     <input
-                                      id=":r3f:"
+
                                       className="p-md"
                                       placeholder="Nhập tên đệm và tên"
                                       value={children.firstName}
                                       onChange={(e) => handleInputChange(e, 'child', index, 'firstName')}
                                     />
-                                    <label for=":r3f:" className="sm ">Tên đệm và tên</label>
+                                    <label className="sm ">Tên đệm và tên</label>
                                   </label>
                                 </div>
                                 <div className=" ">
-                                  <label for=":r3g:" className="Input_input-group__6PMfq">
-                                    <input
-                                      id=":r3g:"
-                                      className="p-md"
-                                      type="date"
-                                      value={children.dob}
-                                      onChange={(e) => handleInputChange(e, 'child', index, 'dob')}
-                                    />
-                                    <label for=":r3g:" className="sm ">Ngày sinh</label>
+                                  <label className="Input_input-group__6PMfq">
+                                    <input className="p-md" type="date" onChange={(e) => handleInputChange(e, 'child', index, 'dob')} />
+                                    <label className="sm ">Ngày sinh</label>
                                   </label>
                                 </div>
                               </div>
@@ -1381,9 +1419,9 @@ const ResultSeach = () => {
                                 </div>
                               </div>
                               <div className="grid grid-cols-3 gap-4 CustomerInfo_input-group__U1xTl">
-                                <div className="relative" ref={(el) => (dropdownRefInfant.current[index] = el)}>
+                                <div className="relative">
                                   <div className=" ">
-                                    <label className="Input_input-group__6PMfq" onClick={(e) => { e.stopPropagation(); toggleDropdownInfant(index); }}>
+                                    <label className="Input_input-group__6PMfq" onClick={() => toggleDropdownInfant(index)}>
                                       <input className="p-md" type="button" value={selectedGenderInfant[index]} />
                                       <svg className='stroke-[#98a2b3]' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                       <label className="sm "></label>
@@ -1397,39 +1435,33 @@ const ResultSeach = () => {
                                   )}
                                 </div>
                                 <div className=" ">
-                                  <label for=":r3e:" className="Input_input-group__6PMfq">
+                                  <label className="Input_input-group__6PMfq">
                                     <input
-                                      id=":r3e:"
+
                                       className="p-md"
                                       placeholder="Nhập họ"
                                       value={infants.lastName}
                                       onChange={(e) => handleInputChange(e, 'infant', index, 'lastName')}
                                     />
-                                    <label for=":r3e:" className="sm ">Họ</label>
+                                    <label className="sm ">Họ</label>
                                   </label>
                                 </div>
                                 <div className=" ">
-                                  <label for=":r3f:" className="Input_input-group__6PMfq">
+                                  <label className="Input_input-group__6PMfq">
                                     <input
-                                      id=":r3f:"
+
                                       className="p-md"
                                       placeholder="Nhập tên đệm và tên"
                                       value={infants.firstName}
                                       onChange={(e) => handleInputChange(e, 'infant', index, 'firstName')}
                                     />
-                                    <label for=":r3f:" className="sm ">Tên đệm và tên</label>
+                                    <label className="sm ">Tên đệm và tên</label>
                                   </label>
                                 </div>
                                 <div className=" ">
-                                  <label for=":r3g:" className="Input_input-group__6PMfq">
-                                    <input
-                                      id=":r3g:"
-                                      type='date'
-                                      className="p-md"
-                                      value={infants.dob}
-                                      onChange={(e) => handleInputChange(e, 'infant', index, 'dob')}
-                                    />
-                                    <label for=":r3g:" className="sm ">Ngày sinh</label>
+                                  <label className="Input_input-group__6PMfq">
+                                    <input className="p-md" type="date" onChange={(e) => handleInputChange(e, 'infant', index, 'dob')} />
+                                    <label className="sm ">Ngày sinh</label>
                                   </label>
                                 </div>
                               </div>
@@ -1830,27 +1862,57 @@ const ResultSeach = () => {
                       </div>
                       <div className="Payment_card-content__FwSj6 flex flex-col gap-5">
                         <div className="TicketDetail_input-group__0wPgi flex gap-4">
-                          <div className="flex flex-col gap-1 flex-grow">
+                          <div className="flex flex-col gap-2 flex-grow">
                             <label className="sm">Hành khách</label>
                             {adultInfo.map((adult, index) => (
                               <div key={index} className="passenger-details">
-                                <p className="md">{adult.lastName}{adult.firstName}</p>
+                                <p className="md">{adult.lastName} {adult.firstName}</p>
+                              </div>
+                            ))}
+                            {childInfo.map((child, index) => (
+                              <div key={index} className="passenger-details">
+                                <p className="md">{child.lastName} {child.firstName}</p>
+                              </div>
+                            ))}
+                            {infantInfo.map((infant, index) => (
+                              <div key={index} className="passenger-details">
+                                <p className="md">{infant.lastName} {infant.firstName}</p>
                               </div>
                             ))}
                           </div>
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-2">
                             <label className="sm">Giới tính</label>
                             {adultInfo.map((adult, index) => (
                               <div key={index} className="passenger-details">
                                 <p className="md">{adult.gender}</p>
                               </div>
                             ))}
+                            {childInfo.map((child, index) => (
+                              <div key={index} className="passenger-details">
+                                <p className="md">{child.gender}</p>
+                              </div>
+                            ))}
+                            {infantInfo.map((infant, index) => (
+                              <div key={index} className="passenger-details">
+                                <p className="md">{infant.gender}</p>
+                              </div>
+                            ))}
                           </div>
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-2">
                             <label className="sm">Ngày sinh</label>
                             {adultInfo.map((adult, index) => (
                               <div key={index} className="passenger-details">
                                 <p className="md">{formatDate(adult.dob)}</p>
+                              </div>
+                            ))}
+                            {childInfo.map((child, index) => (
+                              <div key={index} className="passenger-details">
+                                <p className="md">{formatDate(child.dob)}</p>
+                              </div>
+                            ))}
+                            {infantInfo.map((infant, index) => (
+                              <div key={index} className="passenger-details">
+                                <p className="md">{formatDate(infant.dob)}</p>
                               </div>
                             ))}
                           </div>

@@ -1,6 +1,7 @@
 const { Airport, Booking, Flight, Passenger, Payment, User } = require("../models/model");
 const axios = require('axios')
 const crypto = require('crypto');
+const sendEmail = require('../config/sendMail')
 
 
 const Payments = {
@@ -19,7 +20,7 @@ const Payments = {
             var orderInfo = `Payment for flight ${flight_id} for customer ${email}`;
             var partnerCode = 'MOMO';
             var redirectUrl = process.env.REDIRECT_URI // Địa chỉ trang sau khi thanh toán
-            var ipnUrl = 'https://fe28-171-251-2-210.ngrok-free.app/v1/payment/callback'; // Callback URL để nhận kết quả thanh toán
+            var ipnUrl = 'https://ef31-103-156-46-86.ngrok-free.app/v1/payment/callback'; // Callback URL để nhận kết quả thanh toán
             var requestType = "payWithMethod";
             var orderId = partnerCode + new Date().getTime();
             var requestId = orderId;  // Mỗi yêu cầu thanh toán sẽ có một ID duy nhất
@@ -83,6 +84,15 @@ const Payments = {
             });
 
             const savedPayment = await newPayment.save();
+
+            
+            await sendEmail({
+              email: email,
+              subject: "Chúc mừng bạn đã đặt vé thành công",
+              html: `
+                <h1>Thông tin vé máy bay</h1>
+              `  
+            })
 
             return res.status(200).json({
                 response: response.data,
@@ -286,6 +296,26 @@ const Payments = {
                 error,
                 msg: "loi khi xoa Payment"
             })
+        }
+    },
+
+    getAllPayment: async (req, res) => {
+        try {
+            // Truy vấn tất cả các payment
+            const payments = await Payment.find()
+                .populate('bookingId')
+
+            if (!payments || payments.length === 0) {
+                return res.status(404).json({ message: 'Không có thông tin thanh toán nào' });
+            }
+
+            const totalAmount = payments.reduce((acc, payment) => acc + payment.amount, 0);
+
+            // Trả về danh sách payment
+            res.json({ payments, totalAmount });
+        } catch (error) {
+            console.error('Error fetching payments:', error);
+            res.status(500).json({ message: 'Có lỗi xảy ra khi lấy thông tin thanh toán', error });
         }
     }
 }

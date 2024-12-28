@@ -8,7 +8,9 @@ const Dashboard = () => {
   const [totalTickets, setTotalTickets] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [uniqueAccounts, setUniqueAccounts] = useState(0);
-  const [totalBookings, setTotalBookings] = useState(0)
+  const [totalBookings, setTotalBookings] = useState(0);
+  const [payments, setPayments] = useState([])
+  const [totalAmountPayment, setTotalAmountPayment] = useState(0);
 
   useEffect(() => {
     // Gọi API thống kê tổng số vé và tổng số tiền khi component render
@@ -27,9 +29,27 @@ const Dashboard = () => {
     fetchBookingStats();
   }, []);
 
+  useEffect(() => {
+    const fetchPayment = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/v1/payment/');
+        setPayments(response.data.payments)
+        setTotalAmountPayment(response.data.totalAmount)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchPayment();
+  }, [])
+
+  const formatCurrency = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
   return (
     <div className='Dashboard'>
-      <div className='dashboard-bg h-[100vh]'>
+      <div className='dashboard-bg'>
         <div className='w-full max-w-[1280px] px-8 py-4 m-auto'>
           <div className='flex justify-between gap-3 items-center'>
             <div className='flex gap-3'>
@@ -46,9 +66,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className='max-w-full w-[1080px] py-20 px-8 m-auto transition-transform'>
+        <div className='max-w-full w-[1280px] py-20 px-8 m-auto transition-transform'>
           <div className='grid grid-cols-2'>
-            <div className='cart-statistics flex flex-col items-center gap-10 max-w-[424px] py-8 px-4 max-h-[996px] rounded-[36px] bg-white'>
+            <div className='cart-statistics flex flex-col items-center gap-10 max-w-[424px] mb-7 py-8 px-4 max-h-[996px] rounded-[36px] bg-white'>
               <img
                 alt='mixivivu'
                 src={logo}
@@ -70,7 +90,7 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className='cart-statistics flex flex-col items-center gap-10 max-w-[424px] py-8 px-4 max-h-[996px] rounded-[36px] bg-white'>
+            <div className='cart-statistics flex flex-col items-center gap-10 max-w-[424px] py-8 px-4 mb-7 max-h-[996px] rounded-[36px] bg-white'>
               <img
                 alt='mixivivu'
                 src={logo}
@@ -84,6 +104,35 @@ const Dashboard = () => {
                 <a className='hover:text-primary_base' href='/admin/account'>Xem chi tiết</a>
               </div>
             </div>
+            <div className='cart-statistics flex flex-col items-center gap-10 max-w-[424px] py-8 px-4 max-h-[996px] rounded-[36px] bg-white'>
+              <img
+                alt='mixivivu'
+                src={logo}
+                className='w-60'
+              />
+              <div className='flex flex-col gap-3'>
+                <div className='flex gap-2'>
+                  <label className='md'>Tổng số tiền đã thanh toán: </label>
+                  <p className='subheading sm'>{formatCurrency(totalAmountPayment.toLocaleString())} VND</p>
+                </div>
+                <a className='hover:text-primary_base text-center' href='/admin/payment'>Xem chi tiết</a>
+              </div>
+            </div>
+            <a href='/admin/review'>
+              <div className='cart-statistics flex flex-col items-center gap-10 max-w-[424px] py-8 px-4 max-h-[996px] rounded-[36px] bg-white'>
+                <img
+                  alt='mixivivu'
+                  src={logo}
+                  className='w-60'
+                />
+                <div className='flex flex-col gap-3'>
+                  <div className='flex gap-2'>
+                    <label className='md'>Quản lý đánh giá</label>
+                  </div>
+                  <a className='hover:text-primary_base text-center' href='/admin/payment'>Xem chi tiết</a>
+                </div>
+              </div>
+            </a>
           </div>
         </div>
       </div>

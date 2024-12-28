@@ -10,4 +10,6 @@ router.post('/transaction-status', paymentController.transactionStatus)
 
 router.delete('/', paymentController.deletePayment)
 
+router.get('/', paymentController.getAllPayment)
+
 module.exports = router

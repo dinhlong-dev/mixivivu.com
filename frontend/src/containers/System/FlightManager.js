@@ -46,19 +46,26 @@ const FlightManager = () => {
 
     const handleDepartureDateChange = (date) => {
         setDepartureDate(date);
+        setFlightData((prevData) => ({
+            ...prevData,
+            departure_date: date,
+        }));
         if (datePickerRef.current) {
             datePickerRef.current.setOpen(false);
         }
-        console.log(flightData.departure_date);
-
+        console.log(date); // Log ngày được chọn
     };
 
     const handleArrivalDateChange = (date) => {
         setArrivalDate(date);
+        setFlightData((prevData) => ({
+            ...prevData,
+            arrival_date: date,
+        }));
         if (datePickerRefArival.current) {
             datePickerRefArival.current.setOpen(false);
         }
-        console.log(flightData.arrival_date);
+        console.log(date);
     };
 
     const handleOpenForm = () => {
@@ -290,23 +297,23 @@ const FlightManager = () => {
             const response = await axios.get('http://localhost:5000/v1/flight/');
             setFlights(response.data);
             setLoading(false);
-        }
-
-        setLoading(true);  // Đặt trạng thái loading
-        setError(null);     // Reset lỗi trước khi tìm kiếm mới
-
-        try {
-            // Gửi yêu cầu GET tới API để tìm kiếm chuyến bay
-            const response = await axios.get(`http://localhost:5000/v1/flight/search-by-number?query=${searchQuery}`);
-            if (response.data.length === 0) {
-                setError('Không có chuyến bay nào phù hợp.');
+        } else {
+            setLoading(true);  // Đặt trạng thái loading
+            setError(null);     // Reset lỗi trước khi tìm kiếm mới
+            try {
+                // Gửi yêu cầu GET tới API để tìm kiếm chuyến bay
+                const response = await axios.get(`http://localhost:5000/v1/flight/search-by-number?query=${searchQuery}`);
+                if (response.data.length === 0) {
+                    setError('Không có chuyến bay nào phù hợp.');
+                }
+                setFlights(response.data);  // Cập nhật kết quả tìm kiếm
+            } catch (err) {
+                setError('Không thể tìm kiếm chuyến bay. Vui lòng thử lại.');
+            } finally {
+                setLoading(false);  // Kết thúc quá trình tải
             }
-            setFlights(response.data);  // Cập nhật kết quả tìm kiếm
-        } catch (err) {
-            setError('Không thể tìm kiếm chuyến bay. Vui lòng thử lại.');
-        } finally {
-            setLoading(false);  // Kết thúc quá trình tải
         }
+
     };
 
     // Gọi hàm tìm kiếm mỗi khi query thay đổi
@@ -335,22 +342,21 @@ const FlightManager = () => {
             const response = await axios.get('http://localhost:5000/v1/flight/');
             setFlights(response.data);
             setLoading(false);
-        }
-
-        setLoading(true);
-        setError(null);
-
-        try {
-            const response = await axios.get('http://localhost:5000/v1/flight/airlines', {
-                params: {
-                    airlineIds: selectedAirlines
-                }
-            });
-            setFlights(response.data);
-        } catch (err) {
-            setError('Không thể tìm kiếm chuyến bay. Vui lòng thử lại.');
-        } finally {
-            setLoading(false);
+        } else {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await axios.get('http://localhost:5000/v1/flight/airlines', {
+                    params: {
+                        airlineIds: selectedAirlines
+                    }
+                });
+                setFlights(response.data);
+            } catch (err) {
+                setError('Không thể tìm kiếm chuyến bay. Vui lòng thử lại.');
+            } finally {
+                setLoading(false);
+            }
         }
     };
 
@@ -369,6 +375,20 @@ const FlightManager = () => {
     useEffect(() => {
         fetchFlightsByAirlines();
     }, [selectedAirlines]);
+
+    const handleDeleteFlight = async (id) => {
+        try {
+            await axios.delete(`http://localhost:5000/v1/flight/delete-id/${id}`); // Gọi API xóa sân bay
+
+            // Cập nhật state, loại bỏ sân bay đã xóa
+            setFlights(flights.filter(flight => flight._id !== id));
+
+            alert('Xóa chuyến bay thành công');
+        } catch (error) {
+            console.error('Lỗi khi xóa chuyến bay:', error);
+            alert('Xóa thất bại');
+        }
+    }
 
     return (
         <div>
@@ -681,8 +701,8 @@ const FlightManager = () => {
                                                 <p className='subheading sm'>{flight.available_seats}</p>
                                             </div>
                                         </div>
-                                        <div className='absolute right-[70px] top-[6px] cursor-pointer hover:underline'>Sửa</div>
-                                        <button className='absolute right-6 top-[6px] cursor-pointer hover:underline'>Xóa</button>
+                                        <div className='absolute right-[70px] top-[6px] cursor-pointer hover:underline' >Sửa</div>
+                                        <button className='absolute right-6 top-[6px] cursor-pointer hover:underline' onClick={() => handleDeleteFlight(flight._id)}>Xóa</button>
                                     </div>
                                 ))
                             ) : (

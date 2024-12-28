@@ -13,7 +13,9 @@ export const path = {
     AIRLINE: 'airline',
     FLIGHTMANAGER: 'flight',
     ACCOUNT_MANAGER: 'account',
-    BOOKINGS: 'bookings'
+    BOOKINGS: 'bookings',
+    PAYMENTS: 'payment',
+    REVIEWS: 'review'
 }
 
 export default path
